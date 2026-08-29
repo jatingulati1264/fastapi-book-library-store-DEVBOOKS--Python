@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f4f7f6; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    /* --- E-Commerce Order Card Styling --- */
+    .order-card { border: 1px solid #e0e0e0; border-radius: 12px; background: #ffffff; transition: box-shadow 0.2s ease-in-out; }
+    .order-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .order-header { background-color: #f8f9fa; border-bottom: 1px solid #e0e0e0; border-radius: 12px 12px 0 0; }
+    .book-icon-box { width: 50px; height: 65px; background: #e9ecef; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #6c757d; }
+
+    /* --- Linear Status Tracker --- */
+    .stepper-wrapper { display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; }
+    .stepper-item { position: relative; display: flex; flex-direction: column; align-items: center; flex: 1; text-align: center; }
+    .stepper-item::before { position: absolute; content: ""; border-bottom: 4px solid #e9ecef; width: 100%; top: 16px; left: -50%; z-index: 1; }
+    .stepper-item:first-child::before { content: none; }
+    .stepper-item.completed + .stepper-item.completed::before, .stepper-item.completed + .stepper-item.active::before { border-bottom: 4px solid #198754; }
+    .step-counter { position: relative; z-index: 2; display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; border-radius: 50%; background: #e9ecef; color: #6c757d; font-weight: bold; border: 4px solid #fff; }
+    .stepper-item.completed .step-counter, .stepper-item.active .step-counter { background-color: #198754; color: white; }
+
+    /* --- Pulse Animation for Tracking Button --- */
+    .pulse-dot { width: 8px; height: 8px; background-color: #0d6efd; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(13, 110, 253, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Your Orders</h2>
+            <p class="text-muted mb-0">Track shipments, manage cancellations, or buy again</p>
+        </div>
+        <a href="#helpSection" class="btn btn-outline-secondary rounded-pill px-4"><i class="bi bi-question-circle me-1"></i> Need Help?</a>
+    </div>
+
+    {% if orders | length == 0 %}
+    <div class="text-center py-5 bg-white rounded shadow-sm border">
+        <i class="bi bi-box-seam text-muted opacity-50" style="font-size: 5rem;"></i>
+        <h4 class="fw-bold mt-3">No orders found</h4>
+        <p class="text-muted">Looks like you haven't placed an order yet.</p>
+        <a href="/books" class="btn btn-primary mt-2 px-4 py-2 fw-bold">Start Shopping</a>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for order in orders %}
+        <div class="col-12 mb-4">
+            <div class="order-card shadow-sm">
+
+                <!-- Order Header -->
+                <div class="order-header p-3 d-flex flex-wrap justify-content-between text-muted small">
+                    <div class="d-flex flex-wrap gap-4">
+                        <div>
+                            <div class="text-uppercase fw-semibold">Order Placed</div>
+                            <div class="text-dark">{{ order['order_date'].strftime('%d %b %Y') if order['order_date'] else 'N/A' }}</div>
+                        </div>
+                        <div>
+                            <div class="text-uppercase fw-semibold">Total</div>
+                            <div class="text-dark fw-bold">${{ order.total_amount }}</div>
+                        </div>
+                    </div>
+                    <div class="text-md-end mt-2 mt-md-0">
+                        <div class="text-uppercase fw-semibold">Order ID</div>
+                        <div class="text-dark">#{{ order._id | string | upper | truncate(12, True, '') }}</div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Left Column: Items and Address -->
+                        <div class="col-lg-7 border-end-lg pe-lg-4 mb-4 mb-lg-0">
+                            <h6 class="fw-bold mb-3">Items Ordered</h6>
+                            {% for item in order['items'] %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="book-icon-box shadow-sm me-3"><i class="bi bi-book fs-4"></i></div>
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-0 text-dark">{{ item.book_title }}</h6>
+                                    <small class="text-muted d-block">Author: {{ item.book_author }}</small>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <small class="fw-semibold text-secondary">Qty: {{ item.quantity }}</small>
+                                        <span class="fw-bold text-dark">${{ item.book_price * item.quantity }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <!-- Shipping Address Display & Cancel Order -->
+                            {% set status = order.status | default('Pending') %}
+                            <div class="mt-4 pt-3 border-top">
+                                <h6 class="fw-bold mb-2">Shipping Address</h6>
+                                <p class="small text-dark fw-semibold mb-3">
+                                    {{ order.shipping_address | default('Address not provided.') }}
+                                </p>
+
+                                {% if order.can_cancel %}
+                                    <!-- Dynamic Real-Time Timer Container -->
+                                    <div class="cancel-timer-container" data-remaining="{{ order.remaining_seconds }}" data-order-id="{{ order._id | string }}">
+                                        <a href="/orders/cancel/{{ order._id | string }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this order? This cannot be undone.');">
+                                            <i class="bi bi-x-circle me-1"></i> Cancel Order
+                                        </a>
+                                        <small class="d-block text-danger mt-2 fw-bold" style="font-size: 0.8rem;">
+                                            <i class="bi bi-clock-history me-1"></i> Expires in: <span class="countdown-clock">05:00</span>
+                                        </small>
+                                    </div>
+
+                                    <!-- Hidden Expired State -->
+                                    <div class="cancel-expired-container d-none" id="expired_{{ order._id | string }}">
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            <i class="bi bi-x-circle me-1"></i> Cancel Order
+                                        </button>
+                                        <small class="d-block text-danger mt-2" style="font-size: 0.75rem;">
+                                            <i class="bi bi-info-circle me-1"></i> The 5-minute cancellation window has expired.
+                                        </small>
+                                    </div>
+                                {% elif status in ['Pending', 'Processing'] %}
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                                        <i class="bi bi-x-circle me-1"></i> Cancel Order
+                                    </button>
+                                    <small class="d-block text-danger mt-2" style="font-size: 0.75rem;">
+                                        <i class="bi bi-info-circle me-1"></i> The 5-minute cancellation window has expired.
+                                    </small>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border py-2 px-3">
+                                        <i class="bi bi-lock-fill me-1"></i> Order Locked ({{ status }})
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Status Tracker -->
+                        <div class="col-lg-5 ps-lg-4">
+                            <h6 class="fw-bold mb-4">Delivery Status</h6>
+                            {% set step1 = 'completed' %}
+                            {% set step2 = 'completed' if status in ['Processing', 'Dispatched', 'Delivered'] else ('active' if status == 'Pending' else '') %}
+                            {% set step3 = 'completed' if status in ['Dispatched', 'Delivered'] else ('active' if status == 'Processing' else '') %}
+                            {% set step4 = 'completed' if status == 'Delivered' else ('active' if status == 'Dispatched' else '') %}
+
+                            <div class="stepper-wrapper">
+                                <div class="stepper-item {{ step1 }}"><div class="step-counter"><i class="bi bi-cart-check"></i></div><div class="step-name small fw-semibold mt-1">Placed</div></div>
+                                <div class="stepper-item {{ step2 }}"><div class="step-counter"><i class="bi bi-box-seam"></i></div><div class="step-name small fw-semibold mt-1">Packed</div></div>
+                                <div class="stepper-item {{ step3 }}"><div class="step-counter"><i class="bi bi-truck"></i></div><div class="step-name small fw-semibold mt-1">Shipped</div></div>
+                                <div class="stepper-item {{ step4 }}"><div class="step-counter"><i class="bi bi-house-check"></i></div><div class="step-name small fw-semibold mt-1">Delivered</div></div>
+                            </div>
+
+                            <div class="mt-4 text-center text-lg-start">
+                                {% if status == 'Delivered' %}
+                                    <div class="alert alert-success py-2 mb-0 border-0 fw-semibold text-center"><i class="bi bi-check-circle-fill me-2"></i> Successfully Delivered</div>
+                                {% else %}
+                                    <button class="btn btn-outline-primary w-100 fw-bold track-btn" data-bs-toggle="modal" data-bs-target="#trackingModal" data-order-id="{{ order._id | string }}" data-status="{{ status }}">
+                                        <span class="pulse-dot me-2"></span><i class="bi bi-geo-alt-fill me-1"></i> Track Live Location
+                                    </button>
+                                    <p class="text-muted small mt-2 text-center mb-0">Updates in real-time from courier partners.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- FAQ Section -->
+    <div id="helpSection" class="mt-5 pt-5 border-top">
+        <div class="text-center mb-4"><h3 class="fw-bold">Frequently Asked Questions</h3></div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion shadow-sm" id="faqAccordion">
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqOne"><button class="accordion-button bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">What is your cancellation policy?</button></h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">You can cancel your order for a full refund within exactly 5 minutes of placing it. After 5 minutes, our automated warehouse begins processing the shipment.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqTwo"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">How do I track my shipment in real-time?</button></h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Click the "Track Live Location" button on any active order card to launch the tracking map and view live status updates.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqThree"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">Can I change my shipping address after placing an order?</button></h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">For security purposes, shipping addresses cannot be modified once an order is submitted.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqFour"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">What payment methods do you accept?</button></h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">We accept major credit cards and PayPal transactions, protected via 256-bit SSL encryption.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqFive"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">How long does standard delivery take?</button></h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Standard shipping typically takes between 3 to 5 business days.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqSix"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix">What should I do if my package arrives damaged?</button></h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Please contact our support desk within 7 days of delivery with photos of the package.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqSeven"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven">Are shipping fees included in the book price?</button></h2>
+                        <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Standard shipping is currently free on all domestic orders.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqEight"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight">Can I return a book if I change my mind?</button></h2>
+                        <div id="collapseEight" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Yes, you can initiate a return within 7 days of receiving your order.</div></div>
+                    </div>
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqNine"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine">How are refunds processed after cancellation?</button></h2>
+                        <div id="collapseNine" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">A full refund is immediately triggered back to your original payment method upon cancellation.</div></div>
+                    </div>
+                    <div class="accordion-item border-0">
+                        <h2 class="accordion-header" id="faqTen"><button class="accordion-button collapsed bg-white fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen">Who can I contact if I have issues with my order?</button></h2>
+                        <div id="collapseTen" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body text-muted small">Reach out via our chat widget or customer care support desk anytime.</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Live Tracking Modal with Dynamic/Randomized Delivery Text -->
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title fw-bold" id="trackingModalLabel">Order Tracking</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <iframe width="100%" height="400" style="border:0;" loading="lazy" allowfullscreen src="https://maps.google.com/maps?q=Ambala,%20Haryana&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+      </div>
+      <div class="modal-footer d-flex justify-content-between bg-light border-0">
+        <div class="text-start">
+            <span class="d-block fw-bold text-dark fs-5" id="deliveryStatus">Processing at warehouse</span>
+            <span class="text-muted">Estimated Delivery: <strong id="etaDate" class="text-success fw-bold">Delivering Soon</strong></span>
+        </div>
+        <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 1. Dynamic Live Tracking Details Generator with randomized/flexible ETAs
+    document.addEventListener('click', function(event) {
+        const trackBtn = event.target.closest('.track-btn');
+        if (trackBtn) {
+            const orderId = trackBtn.getAttribute('data-order-id') || "XXXX";
+            const status = trackBtn.getAttribute('data-status') || "Processing";
+            document.getElementById('trackingModalLabel').innerText = `Live Tracking: Order #${orderId.slice(-4).toUpperCase()}`;
+
+            let statusText = "Processing at warehouse";
+            if (status === 'Dispatched') statusText = "Out for delivery - Courier agent assigned";
+            else if (status === 'Delivered') statusText = "Successfully Delivered";
+            document.getElementById('deliveryStatus').innerText = statusText;
+
+            // Show dynamic phrases or varied dates depending on order state
+            if (status === 'Pending') {
+                document.getElementById('etaDateinnerText') || (document.getElementById('etaDate').innerText = "Delivering Soon (3-5 Days)");
+            } else {
+                const deliveryDate = new Date();
+                deliveryDate.setDate(deliveryDate.getDate() + Math.floor(Math.random() * 3) + 1);
+                document.getElementById('etaDate').innerText = deliveryDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            }
+        }
+    });
+
+    // 2. Real-Time 5-Minute Cancellation Clock
+    document.addEventListener("DOMContentLoaded", function() {
+        const timers = document.querySelectorAll('.cancel-timer-container');
+
+        timers.forEach(container => {
+            let timeLeft = parseInt(container.getAttribute('data-remaining'));
+            const orderId = container.getAttribute('data-order-id');
+            const clockSpan = container.querySelector('.countdown-clock');
+
+            if (isNaN(timeLeft) || timeLeft <= 0) {
+                container.classList.add('d-none');
+                const expiredContainer = document.getElementById(`expired_${orderId}`);
+                if(expiredContainer) expiredContainer.classList.remove('d-none');
+                return;
+            }
+
+            function updateClockDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                if (clockSpan) {
+                    clockSpan.innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+
+            updateClockDisplay();
+
+            const timerId = setInterval(() => {
+                timeLeft -= 1;
+
+                if (timeLeft > 0) {
+                    updateClockDisplay();
+                } else {
+                    clearInterval(timerId);
+                    container.classList.add('d-none');
+                    const expiredContainer = document.getElementById(`expired_${orderId}`);
+                    if(expiredContainer) expiredContainer.classList.remove('d-none');
+                }
+            }, 1000);
+        });
+    });
+</script>
+{% endblock %}

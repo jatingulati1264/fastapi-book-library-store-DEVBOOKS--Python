@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+    .form-card {
+        border: none;
+        border-top: 5px solid #0d6efd;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 3rem;
+        margin-top: 3rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="form-card">
+                <div class="text-center pb-4 mb-4 border-bottom">
+                    <h2 class="fw-bold text-dark">Edit Your Review</h2>
+                    <p class="text-muted small mb-0">Modify your rating or feedback below.</p>
+                </div>
+
+                <form action="/books/comment/edit/{{ comment._id }}" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Rating</label>
+                        <select class="form-select" name="rating">
+                            <option value="5" {% if comment.rating|int == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ (5/5 - Excellent)</option>
+                            <option value="4" {% if comment.rating|int == 4 %}selected{% endif %}>⭐⭐⭐⭐ (4/5 - Very Good)</option>
+                            <option value="3" {% if comment.rating|int == 3 %}selected{% endif %}>⭐⭐⭐ (3/5 - Average)</option>
+                            <option value="2" {% if comment.rating|int == 2 %}selected{% endif %}>⭐⭐ (2/5 - Poor)</option>
+                            <option value="1" {% if comment.rating|int == 1 %}selected{% endif %}>⭐ (1/5 - Terrible)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Review Text</label>
+                        <textarea class="form-control" name="review_text" rows="5" required>{{ comment.review_text }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Save Changes</button>
+                        <a href="/books/{{ comment.book_id }}" class="btn btn-outline-secondary w-100 fw-bold py-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

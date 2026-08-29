@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    .form-card {
+        border: none;
+        border-top: 5px solid #0d6efd;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 3.5rem;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+
+    .btn-submit {
+        padding: 0.85rem;
+        font-weight: 700;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(13, 110, 253, 0.2);
+    }
+
+    .page-header {
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .required-asterisk {
+        color: #e11d48;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="form-card">
+                <div class="page-header text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person-gear fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark">Update Profile</h2>
+                    <p class="text-muted small mb-0">Modify your account settings and credentials below.</p>
+                    <p class="small text-danger mt-2 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i> All fields marked with * are required.</p>
+                </div>
+
+                <!-- Added enctype="multipart/form-data" to allow file/image uploads -->
+                <form action="/users/update/{{ id }}" method="POST" enctype="multipart/form-data">
+
+                    <!-- Placed Name and Email side-by-side -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label"><i class="bi bi-person me-1"></i> Full Name <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ update_record.user_name }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="email" class="form-label"><i class="bi bi-envelope me-1"></i> Email Address <span class="required-asterisk">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ update_record.user_email }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Placed Password and System Role side-by-side -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label"><i class="bi bi-lock me-1"></i> Password <span class="required-asterisk">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" value="{{ update_record.user_password }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="type" class="form-label"><i class="bi bi-shield-lock me-1"></i> System Role</label>
+                            <select class="form-control text-muted" style="background-color: #e2e8f0; cursor: not-allowed;" id="type" disabled>
+                                <option value="Admin" {% if update_record.user_type == 'Admin' %} selected {% endif %}>Admin</option>
+                                <option value="Guest" {% if update_record.user_type == 'Guest' %} selected {% endif %}>Guest</option>
+                            </select>
+                            <input type="hidden" name="type" value="{{ update_record.user_type }}">
+                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i> Contact admin to change roles.</small>
+                        </div>
+                    </div>
+
+                    <!-- Profile Image File Upload Field -->
+                    <div class="mb-4">
+                        <label for="profile_image" class="form-label"><i class="bi bi-image me-1"></i> Profile Avatar Image</label>
+                        <input type="file" class="form-control bg-white" id="profile_image" name="profile_image" accept="image/*">
+                        <small class="text-muted">Optional: Upload a new profile picture. Leave blank to keep your current avatar.</small>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary w-100 btn-submit shadow-sm">
+                            <i class="bi bi-cloud-arrow-up me-2"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

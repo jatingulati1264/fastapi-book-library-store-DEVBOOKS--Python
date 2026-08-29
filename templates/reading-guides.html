@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    /* Modern Header */
+    .guides-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+    }
+
+    /* Interactive Cards */
+    .guide-card {
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: white;
+        overflow: hidden;
+    }
+    .guide-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+        border-color: #cbd5e1;
+    }
+
+    .category-badge {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+
+    .guide-icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<header class="guides-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-3"><i class="bi bi-map me-2 text-primary"></i>Reading Guides</h1>
+        <p class="lead text-white-50 mb-0">Curated roadmaps to master technical subjects, from architecture to deep learning.</p>
+    </div>
+</header>
+
+<main class="container mb-5">
+    <!-- Guides Grid -->
+    <div class="row g-4 mb-5">
+        <!-- Guide 1: Python Mastery -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm guide-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <span class="badge bg-primary bg-opacity-10 text-primary mb-3 category-badge align-self-start">Language Mastery</span>
+                    <h4 class="fw-bold text-dark">Python for Professionals</h4>
+                    <p class="text-muted small mb-4">Go beyond syntax. This guide covers clean code, design patterns, and high-performance Python.</p>
+
+                    <ul class="list-unstyled mb-4 mt-auto">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> Fluent Python</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> Effective Python</li>
+                        <li><i class="bi bi-check2-circle text-success me-2"></i> Architecture Patterns</li>
+                    </ul>
+                    <a href="https://roadmap.sh/python" target="_blank" class="btn btn-outline-primary w-100 fw-bold rounded-pill">View Roadmap</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guide 2: System Design -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm guide-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <span class="badge bg-dark bg-opacity-10 text-dark mb-3 category-badge align-self-start">Architecture</span>
+                    <h4 class="fw-bold text-dark">System Design 101</h4>
+                    <p class="text-muted small mb-4">Learn how to build scalable systems. From load balancing to distributed databases.</p>
+
+                    <ul class="list-unstyled mb-4 mt-auto">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> Designing Data-Intensive Apps</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> Clean Architecture</li>
+                        <li><i class="bi bi-check2-circle text-success me-2"></i> Microservices Patterns</li>
+                    </ul>
+                    <a href="https://roadmap.sh/software-design-architecture" target="_blank" class="btn btn-outline-dark w-100 fw-bold rounded-pill">View Roadmap</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guide 3: Web Development -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm guide-card">
+                <div class="card-body p-4 d-flex flex-column">
+                    <span class="badge bg-info bg-opacity-10 text-info-emphasis mb-3 category-badge align-self-start">Full Stack</span>
+                    <h4 class="fw-bold text-dark">Modern Web Backend</h4>
+                    <p class="text-muted small mb-4">Specialized path for FastAPI, asynchronous programming, and API security.</p>
+
+                    <ul class="list-unstyled mb-4 mt-auto">
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> HTTP/2 Explained</li>
+                        <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i> Mastering FastAPI</li>
+                        <li><i class="bi bi-check2-circle text-success me-2"></i> OAuth 2.0 Guide</li>
+                    </ul>
+                    <a href="https://roadmap.sh/full-stack" target="_blank" class="btn btn-outline-info text-dark fw-bold w-100 rounded-pill">View Roadmap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter / CTA -->
+    <div class="row justify-content-center mt-5 pt-4 border-top">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="guide-icon"><i class="bi bi-envelope-paper-fill"></i></div>
+            <h3 class="fw-bold">Get Monthly Guide Updates</h3>
+            <p class="text-muted small">We update our reading lists monthly based on industry trends.</p>
+            <div class="input-group mt-4 shadow-sm rounded-pill overflow-hidden border">
+                <input type="email" class="form-control border-0 px-4 py-3" placeholder="Enter your email address...">
+                <button class="btn btn-primary px-4 fw-bold" type="button">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

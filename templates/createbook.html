@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+    .form-card {
+        border: none;
+        border-top: 5px solid #0d6efd;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 3.5rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .bulk-card {
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
+        background: #f8fafc;
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        transition: all 0.3s;
+    }
+    .bulk-card:hover {
+        border-color: #0d6efd;
+        background: #f0f9ff;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-right: none;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .price-input {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .btn-submit {
+        padding: 0.85rem;
+        font-weight: 700;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(13, 110, 253, 0.2);
+    }
+
+    .page-header {
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .required-asterisk {
+        color: #e11d48;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-lg-10">
+            <!-- Manual Entry Form -->
+            <div class="form-card">
+                <div class="page-header text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-book-half fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark">Add New Book</h2>
+                    <p class="text-muted small mb-0">Enter the details below to catalog a new book in the library.</p>
+                    <p class="small text-danger mt-2 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i> All fields marked with * are required.</p>
+                </div>
+
+                <form action="/create-book" method="POST" enctype="multipart/form-data">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label for="title" class="form-label"><i class="bi bi-type me-1"></i> Book Title <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Mastering FastAPI" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="author" class="form-label"><i class="bi bi-person me-1"></i> Author <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="author" name="author" placeholder="Author name..." required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="desc" class="form-label"><i class="bi bi-card-text me-1"></i> Description <span class="required-asterisk">*</span></label>
+                        <textarea class="form-control" id="desc" name="description" rows="4" placeholder="Brief summary of the book..." required></textarea>
+                    </div>
+
+                    <!-- Cover Image Upload Field -->
+                    <div class="mb-4">
+                        <label for="book_image" class="form-label"><i class="bi bi-image me-1"></i> Cover Image File</label>
+                        <input type="file" class="form-control bg-white" id="book_image" name="book_image" accept="image/*">
+                        <small class="text-muted">Optional: Upload an image file. If left blank, a default topic cover will be assigned.</small>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label for="available_copies" class="form-label"><i class="bi bi-layers me-1"></i> Available Copies <span class="required-asterisk">*</span></label>
+                            <input type="number" class="form-control" id="available_copies" name="available_copies" placeholder="0" min="0" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="total_copies" class="form-label"><i class="bi bi-boxes me-1"></i> Total Inventory <span class="required-asterisk">*</span></label>
+                            <input type="number" class="form-control" id="total_copies" name="total_copies" placeholder="0" min="0" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="price" class="form-label"><i class="bi bi-tag me-1"></i> Price <span class="required-asterisk">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control price-input" id="price" name="price" placeholder="0.00" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="submit" class="btn btn-primary w-100 btn-submit shadow-sm">
+                            <i class="bi bi-cloud-arrow-up me-2"></i> Save Book to Library
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bulk JSON Upload Section -->
+            <div class="bulk-card text-center">
+                <i class="bi bi-filetype-json display-5 text-primary mb-3"></i>
+                <h4 class="fw-bold">Bulk Import via JSON</h4>
+                <p class="text-muted small mb-4">Have a large collection? Upload a JSON file containing an array of book objects to instantly add them to the database.</p>
+
+                <form action="/upload-books" method="POST" enctype="multipart/form-data" class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
+                    <input type="file" class="form-control w-auto bg-white" name="file" accept=".json" required>
+                    <button type="submit" class="btn btn-outline-primary fw-bold px-4"><i class="bi bi-upload me-2"></i>Import Books</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</main>
+{% endblock %}

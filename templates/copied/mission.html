@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* --- Sophisticated Mission Header --- */
+    .mission-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        padding: 120px 0 100px 0;
+        border-radius: 0 0 50px 50px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Subtle geometric background pattern */
+    .mission-header::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: radial-gradient(#3b82f6 0.5px, transparent 0.5px);
+        background-size: 30px 30px;
+        opacity: 0.1;
+    }
+
+    /* --- Advanced Value Cards --- */
+    .value-card {
+        border: none;
+        border-radius: 20px;
+        background: white;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .value-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important;
+    }
+
+    .value-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 5px;
+        background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        background: #f1f5f9;
+        color: #3b82f6;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        transition: 0.3s;
+    }
+
+    .value-card:hover .icon-circle {
+        background: #3b82f6;
+        color: white;
+        transform: rotate(-10deg);
+    }
+
+    /* --- Founder Section Refined --- */
+    .founder-card {
+        background: white;
+        border-radius: 30px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    }
+
+    .founder-img-wrapper {
+        background: #f1f5f9;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 250px;
+    }
+
+    .founder-img-wrapper i {
+        font-size: 5rem;
+        color: #cbd5e1;
+    }
+
+    .quote-icon {
+        font-size: 3rem;
+        color: #3b82f6;
+        opacity: 0.2;
+        margin-bottom: -20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <header class="mission-header text-center">
+        <div class="container position-relative" style="z-index: 2;">
+            <span class="badge bg-primary px-3 py-2 mb-3 rounded-pill">OUR PURPOSE</span>
+            <h1 class="display-3 fw-bold mb-3">Fueling the Next Generation of Builders</h1>
+            <p class="lead opacity-75 mx-auto" style="max-width: 700px;">
+                Knowledge is the only tool that grows the more it is shared. We are the stewards of the blueprints that build the future.
+            </p>
+        </div>
+    </header>
+
+    <section class="py-5 container">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-9 text-center">
+                <h6 class="text-primary fw-bold text-uppercase mb-3">The Blueprint</h6>
+                <h2 class="fw-bold mb-4 display-6">Curation is a Moral Imperative</h2>
+                <p class="fs-5 text-secondary leading-relaxed">
+                    In an era of fleeting digital tutorials and ephemeral documentation, we believe in the <strong>sovereignty of the printed word</strong>. Our mission is to preserve the foundational texts of computer science, ensuring every developer possesses the deep architectural wisdom required to build robust, ethical, and world-changing software.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light-subtle">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Principles of the Archive</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 p-5 value-card shadow-sm">
+                        <div class="icon-circle"><i class="bi bi-shield-lock"></i></div>
+                        <h4 class="fw-bold">Technical Integrity</h4>
+                        <p class="text-muted">We only curate books that offer permanent value. We reject "hype-cycles" in favor of pure technical growth and engineering mastery.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-5 value-card shadow-sm">
+                        <div class="icon-circle"><i class="bi bi-globe"></i></div>
+                        <h4 class="fw-bold">Knowledge Equity</h4>
+                        <p class="text-muted">Bridging the gap between high-cost technical education and passionate learners. If you have the curiosity, we provide the resources.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-5 value-card shadow-sm">
+                        <div class="icon-circle"><i class="bi bi-cpu"></i></div>
+                        <h4 class="fw-bold">First Principles</h4>
+                        <p class="text-muted">Tech stacks change, but logic is eternal. We focus on the principles that remain true decade after decade, from silicon to software.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container py-5 my-5">
+        <div class="founder-card shadow-sm">
+            <div class="row g-0 align-items-stretch">
+                <div class="col-md-4 col-lg-3">
+                    <div class="founder-img-wrapper">
+                        <i class="bi bi-person-bounding-box"></i>
+                    </div>
+                </div>
+                <div class="col-md-8 col-lg-9 p-5">
+                    <i class="bi bi-quote quote-icon d-block"></i>
+                    <h3 class="fw-bold mb-3">A Message from the Founder</h3>
+                    <p class="fs-4 fst-italic text-secondary mb-4">
+                        "I started DevBooks because reading a physical copy of <em>The C Programming Language</em> changed my mental model of computing more than any video ever could. We exist to provide that 'Aha!' moment to every engineer who seeks it."
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary" style="width: 40px; height: 3px; margin-right: 15px;"></div>
+                        <div>
+                            <p class="fw-bold mb-0 text-dark">Alex Rivera</p>
+                            <p class="small text-muted mb-0">Lead Architect & Founder, DevBooks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

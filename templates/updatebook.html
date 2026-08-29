@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block style %}
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .form-card {
+            border: none;
+            border-top: 5px solid #0d6efd;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn-submit {
+            padding: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .para{
+            color: red;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <main class="container my-5">
+        <p class="para">*Please fill all the required fields!</p>
+        <div class="row justify-content-center">
+            <div class="col-md-18 col-lg-17">
+                <div class="form-card">
+                    <div class="page-header text-center">
+                        <h2 class="fw-bold text-dark">Update Book</h2>
+                        <p class="text-muted small">Enter the details to add a book to the library</p>
+                    </div>
+
+                    <form action="/update/{{id}}" method="POST">
+                        <div class="form-group">
+                            <label for="title"><i class="bi bi-type me-1"></i> Book Title* </label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{updated_record.book_title}}" placeholder="e.g. Mastering FastAPI">
+                        </div>
+                         <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                     <label for="author"><i class="bi bi-person me-1"></i> Author* </label>
+                                     <input type="text" class="form-control" id="author" name="author" value="{{updated_record.book_author}}" placeholder="Author name...">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="desc"><i class="bi bi-card-text me-1"></i> Description* </label>
+                            <input class="form-control" id="desc" name="description" value="{{updated_record.book_description}}" placeholder="Brief summary of the book...">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="available_copies">Available Copies*</label>
+                                    <input type="number" class="form-control" id="available_copies" name="available_copies" value="{{updated_record.book_available_copies}}" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="total_copies">Total Inventory*</label>
+                                    <input type="number" class="form-control" id="total_copies" name="total_copies" value="{{updated_record.book_total_copies}}" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="price"><i class="bi bi-currency-dollar me-1"></i> Price*</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{updated_record.book_price}}" placeholder="0.00">
+                            </div>
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-primary btn-block btn-submit shadow-sm">
+                            <i class="bi bi-cloud-arrow-up me-2"></i> Update Book to Library
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+{% endblock %}

@@ -1,0 +1,48 @@
+# ** BOOK LIBRARY PROJECT with fastapi backend **
+
+
+# create a virtual environment
+# pip install virtualenv
+
+# virtualenv env
+# env/Scripts/activate.ps1
+
+pip install fastapi
+pip install "uvicorn[standard]"
+
+# First connect to mongodb and then create a cluster, create a db user in the cluster
+# under database and network access and then connect to the cluster via mongo compass
+# db_uri copy it and use it in mongodb compass app and create a connection there.
+
+
+MONGODB_URI = "mongodb+srv://db_user1:jatin123@cluster3.wq3rxwr.mongodb.net/"
+
+
+# Create the project structure:
+  FastAPI New Project
+     | ---- env
+     | ---- config
+     | ---- models
+     | ---- routes
+     | ---- static
+     | ---- templates
+     |  index.py or main.py file
+
+
+
+config -> db.py
+     pip install pymongo
+
+
+# To run the application:
+# uvicron main:app --reload
+
+
+ pip install jinja2
+
+
+ pip install "python-jose[cryptography]" bcrypt
+
+ By adding [cryptography], you tell pip to install the secure C-based libraries
+ that handle the actual math behind the jwt.encode and jwt.decode functions.
+ Without it, you might get errors about missing "backends."

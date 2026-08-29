@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+    
+    /* Image Gallery */
+    .product-gallery {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        border: 1px solid #e2e8f0;
+    }
+    .carousel-item img {
+        border-radius: 12px;
+        height: 450px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .carousel-indicators [data-bs-target] {
+        background-color: #0d6efd;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    /* Product Info */
+    .price-display {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #0f172a;
+    }
+    .rating-stars { color: #f59e0b; font-size: 1.1rem; }
+
+    .action-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 2rem;
+        position: sticky;
+        top: 100px;
+    }
+
+    /* Reviews Section */
+    .review-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .reviewer-avatar {
+        width: 40px; height: 40px;
+        background: #e2e8f0;
+        color: #475569;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+
+    <!-- Alert Feedback Banners -->
+    {% if alert == 'review-added' %}
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
+        <strong><i class="bi bi-check-circle-fill me-2"></i>Review Submitted!</strong> Thank you for sharing your feedback.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% elif alert == 'review-updated' %}
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4">
+        <strong><i class="bi bi-check-circle-fill me-2"></i>Review Updated!</strong> Your changes have been saved successfully.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% elif alert == 'review-deleted' %}
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4">
+        <strong><i class="bi bi-trash3-fill me-2"></i>Review Deleted.</strong> Your review has been removed.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="/books" class="text-decoration-none">Library</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ book.book_title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5 mb-5">
+
+        <!-- Left: Dynamic Image Carousel (3 Randomized Pictures) -->
+        <div class="col-lg-5">
+            <div class="product-gallery shadow-sm">
+                <div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators mb-2">
+                        <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="0" class="active"></button>
+                        <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#bookCarousel" data-bs-slide-to="2"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{{ book.images[0] if book.images else 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80' }}" alt="Book Cover 1">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ book.images[1] if book.images and book.images|length > 1 else 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80' }}" alt="Book Cover 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ book.images[2] if book.images and book.images|length > 2 else 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=600&q=80' }}" alt="Book Cover 3">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#bookCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#bookCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle & Right: Product Details & Actions -->
+        <div class="col-lg-7">
+            <div class="d-flex flex-column h-100">
+
+                <h1 class="fw-black text-dark mb-2">{{ book.book_title }}</h1>
+                <h5 class="text-primary mb-3">by {{ book.book_author }}</h5>
+
+                <div class="d-flex align-items-center gap-3 mb-4 pb-4 border-bottom">
+                    <div class="rating-stars">
+                        {% if avg_rating > 0 %}
+                            {% for i in range(5) %}
+                                {% if i < avg_rating|round %} <i class="bi bi-star-fill"></i> {% else %} <i class="bi bi-star"></i> {% endif %}
+                            {% endfor %}
+                            <span class="text-dark fw-bold ms-2">{{ avg_rating }}</span>
+                        {% else %}
+                            {% for i in range(5) %}
+                                <i class="bi bi-star text-muted"></i>
+                            {% endfor %}
+                            <span class="text-muted fw-semibold ms-2 small">No ratings yet</span>
+                        {% endif %}
+                    </div>
+                    {% if avg_rating > 0 %}
+                        <span class="text-muted small">|</span>
+                        <a href="#reviews" class="text-decoration-none small text-muted">{{ comments|length }} Ratings & Reviews</a>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <div class="price-display mb-1">${{ book.book_price }}</div>
+                    <p class="text-muted small mb-0">Inclusive of all taxes. Free shipping applied.</p>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold">Description</h6>
+                    <p class="text-secondary" style="line-height: 1.7;">{{ book.book_description }}</p>
+                </div>
+
+                <div class="action-panel mt-auto shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <span class="d-block small text-muted fw-bold mb-1">AVAILABILITY</span>
+                            {% if book.book_available_copies | int > 0 %}
+                                <h5 class="text-success fw-bold mb-0"><i class="bi bi-check-circle-fill me-1"></i> In Stock ({{ book.book_available_copies }})</h5>
+                            {% else %}
+                                <h5 class="text-danger fw-bold mb-0"><i class="bi bi-x-circle-fill me-1"></i> Out of Stock</h5>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <span class="d-block small text-muted fw-bold mb-1">CATALOG ID</span>
+                            <span class="badge bg-light text-dark border">#{{ book._id | string | truncate(8, True, '') | upper }}</span>
+                        </div>
+                    </div>
+
+                    <a href="/add-cartitem/{{book._id}}" class="btn btn-primary btn-lg w-100 fw-bold py-3 {% if book.book_available_copies | int == 0 %}disabled{% endif %}">
+                        <i class="bi bi-bag-plus me-2"></i> Add to Cart
+                    </a>
+
+                    {% if user and user.user_type == 'Admin' %}
+                    <div class="row g-2 mt-2">
+                        <div class="col-6">
+                            <a href="/update/{{book._id}}" class="btn btn-warning w-100 fw-bold">Edit Details</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="/delete/{{book._id}}" class="btn btn-outline-danger w-100 fw-bold">Delete Book</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Ratings & Comments Section -->
+    <div id="reviews" class="pt-5 border-top">
+        <h3 class="fw-bold mb-4">Customer Reviews</h3>
+
+        <div class="row">
+            <!-- Review Submission Form -->
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <div class="card border-0 shadow-sm bg-light">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Review this book</h5>
+                        <p class="text-muted small mb-4">Share your thoughts with other customers.</p>
+
+                        {% if user %}
+                        <form action="/books/{{ book._id }}/comment" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">RATING</label>
+                                <select class="form-select" name="rating">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5/5 - Excellent)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4/5 - Very Good)</option>
+                                    <option value="3">⭐⭐⭐ (3/5 - Average)</option>
+                                    <option value="2">⭐⭐ (2/5 - Poor)</option>
+                                    <option value="1">⭐ (1/5 - Terrible)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">YOUR REVIEW</label>
+                                <textarea class="form-control" name="review_text" rows="4" placeholder="What did you like or dislike?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100 fw-bold">Submit Review</button>
+                        </form>
+                        {% else %}
+                        <div class="text-center py-3">
+                            <p class="mb-3 text-muted">You must be logged in to leave a review.</p>
+                            <a href="/users/login" class="btn btn-primary px-4 fw-bold">Login Now</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments & Reviews List -->
+            <div class="col-lg-8">
+                {% if comments|length == 0 %}
+                    <div class="text-center py-5 bg-white rounded border">
+                        <i class="bi bi-chat-square-text text-muted opacity-25" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">No reviews yet</h5>
+                        <p class="text-muted small">Be the first to review this item!</p>
+                    </div>
+                {% else %}
+                    {% for comment in comments %}
+                    <div class="review-card shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="reviewer-avatar">{{ comment.user_name[0] | upper }}</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{ comment.user_name }}</h6>
+                                    <small class="text-muted">{{ comment.created_at }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rating-stars small">
+                                    {% for i in range(5) %}
+                                        {% if i < comment.rating|int %} <i class="bi bi-star-fill"></i> {% else %} <i class="bi bi-star"></i> {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <!-- User Edit/Delete Options -->
+                                {% if user and (user.user_id == comment.user_id or user.user_type == 'Admin') %}
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light border-0 text-muted" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        {% if user.user_id == comment.user_id %}
+                                        <li><a class="dropdown-item small fw-bold" href="/books/comment/edit/{{ comment._id }}"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit</a></li>
+                                        {% endif %}
+                                        <li><a class="dropdown-item small fw-bold text-danger" href="/books/comment/delete/{{ comment._id }}"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">{{ comment.review_text }}</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

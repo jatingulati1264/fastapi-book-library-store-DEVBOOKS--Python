@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; }
+
+    /* Feature Interview Card */
+    .interview-feature-card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: white;
+        transition: transform 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+    .interview-feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
+    }
+    .feature-img-wrapper {
+        height: 100%;
+        min-height: 300px;
+    }
+    .feature-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Small Grid Cards */
+    .interview-card {
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        background: white;
+    }
+    .interview-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+        border-color: #cbd5e1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5 py-4">
+
+    <!-- Page Header -->
+    <div class="row mb-5 text-center text-md-start">
+        <div class="col-md-8">
+            <h1 class="fw-black text-dark"><i class="bi bi-mic-fill me-2 text-primary"></i>Author Interviews</h1>
+            <p class="lead text-muted">Exclusive conversations with the world's leading technical authors and developers.</p>
+        </div>
+    </div>
+
+    <!-- Featured Interview -->
+    <div class="interview-feature-card shadow-sm mb-5">
+        <div class="row g-0 align-items-stretch">
+            <div class="col-md-5 col-lg-6">
+                <div class="feature-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800" class="feature-img" alt="Featured Author">
+                </div>
+            </div>
+            <div class="col-md-7 col-lg-6 d-flex align-items-center">
+                <div class="p-4 p-lg-5">
+                    <span class="badge bg-primary rounded-pill px-3 py-2 mb-3 small fw-bold uppercase">New Release</span>
+                    <h2 class="fw-bold text-dark mb-3">Deep Dive into Python Internals</h2>
+                    <p class="text-secondary mb-4" style="line-height: 1.6;">An interview with the author of "CPython Explored". We discuss the future of the GIL, performance improvements, and why technical writing is harder than coding.</p>
+
+                    <div class="d-flex align-items-center justify-content-between mt-4">
+                        <small class="text-muted fw-semibold"><i class="bi bi-calendar3 me-1"></i> Jan 10, 2026 • 15 min read</small>
+                        <a href="#" class="btn btn-dark px-4 py-2 rounded-pill fw-bold">Read Full <i class="bi bi-arrow-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Older Interviews Grid -->
+    <h4 class="fw-bold mb-4 mt-5">Previous Conversations</h4>
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+            <div class="card h-100 interview-card shadow-sm">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="fw-bold text-dark">Mastering Microservices</h5>
+                    <p class="small text-muted mb-4">A conversation about distributed systems and architectural patterns with Sarah Jenkins.</p>
+                    <a href="#" class="text-decoration-none fw-bold text-primary mt-auto">Read More <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 interview-card shadow-sm">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="fw-bold text-dark">The Art of Clean Code</h5>
+                    <p class="small text-muted mb-4">How to maintain large codebases without losing your mind.</p>
+                    <a href="#" class="text-decoration-none fw-bold text-primary mt-auto">Read More <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 interview-card shadow-sm">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="fw-bold text-dark">AI in Development</h5>
+                    <p class="small text-muted mb-4">Discussing the role of LLMs in the modern software engineering workflow.</p>
+                    <a href="#" class="text-decoration-none fw-bold text-primary mt-auto">Read More <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

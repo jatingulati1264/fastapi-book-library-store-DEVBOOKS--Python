@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* --- Header & Search Styling --- */
+    .directory-header {
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .search-wrapper {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        border: 1px solid #e2e8f0;
+    }
+
+    .search-flex-container { display: flex; align-items: center; gap: 15px; }
+
+    .search-container { position: relative; flex-grow: 1; }
+
+    .search-input {
+        border-radius: 10px !important;
+        padding: 0.6rem 1rem 0.6rem 2.5rem !important;
+        border: 1px solid #cbd5e1 !important;
+        background-color: #fcfcfd !important;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1) !important;
+        background-color: white !important;
+    }
+
+    .search-icon {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%); color: #94a3b8;
+    }
+
+    .clear-icon {
+        position: absolute; right: 12px; top: 50%;
+        transform: translateY(-50%); color: #64748b;
+        cursor: pointer; transition: color 0.2s;
+    }
+    .clear-icon:hover { color: #dc3545; }
+
+    /* --- User Card Refinement --- */
+    .user-card {
+        border: none !important;
+        border-radius: 16px !important;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+    }
+
+    /* Avatar & Role Badge */
+    .user-avatar {
+        width: 48px; height: 48px;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .role-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 5px 10px;
+        border-radius: 6px;
+    }
+
+    .badge-admin { background-color: #fff1f2; color: #e11d48; }
+    .badge-guest { background-color: #f0f9ff; color: #0369a1; }
+
+    .user-name { color: #1e293b; font-size: 1.1rem; }
+    .user-email { color: #64748b; font-weight: 400; }
+
+    .id-tag {
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.75rem;
+        background: #f8fafc;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #94a3b8;
+    }
+
+    /* Action Buttons */
+    .btn-action-edit {
+        background-color: #fefce8 !important;
+        color: #854d0e !important;
+        border: 1px solid #fef08a !important;
+    }
+    .btn-action-delete {
+        background-color: #fff1f2 !important;
+        color: #9f1239 !important;
+        border: 1px solid #fecdd3 !important;
+    }
+    .btn-action-edit:hover, .btn-action-delete:hover { opacity: 0.8; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="directory-header d-flex justify-content-between align-items-end">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">User Directory</h2>
+            <p class="text-muted mb-0 small">Secure management of access levels and system accounts</p>
+        </div>
+        <span class="badge bg-dark rounded-pill px-3 py-2">{{ all_users | length }} Total Members</span>
+    </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10 col-lg-8">
+            <div class="search-wrapper">
+                <div class="search-flex-container">
+                    <span class="fw-bold text-secondary small text-uppercase">Filter</span>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon" id="mainSearchIcon"></i>
+                        <input type="text" id="userSearch" class="form-control search-input" placeholder="Search by name, email, or system role...">
+                        <i class="fas fa-times-circle clear-icon d-none" id="clearSearch"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if all_users | length == 0 %}
+        <div class="text-center py-5">
+            <i class="fas fa-users-slash text-muted opacity-25" style="font-size: 4rem;"></i>
+            <h4 class="mt-3 text-muted fw-light">The directory is currently empty.</h4>
+        </div>
+    {% else %}
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="userGrid">
+        {% for member in all_users %}
+        <div class="col user-item">
+            <div class="card h-100 user-card shadow-sm border-0">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="user-avatar shadow-sm">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <span class="role-badge {% if member.user_type == 'Admin' %}badge-admin{% else %}badge-guest{% endif %}">
+                            {{ member.user_type }}
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="user-name fw-bold mb-1">{{ member.user_name }}</h5>
+                        <p class="user-email small mb-0">{{ member.user_email }}</p>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted" style="font-size: 0.7rem;">JOINED: {{ member.user_created_at if member.user_created_at else "2026-01-18" }}</span>
+                            <span class="id-tag">#{{ member.user_id }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="/users/update/{{member.user_id}}" class="btn btn-action-edit btn-sm w-100 fw-bold">Edit</a>
+                        </div>
+                        <div class="col-6">
+                            <a href="/users/delete/{{member.user_id}}" class="btn btn-action-delete btn-sm w-100 fw-bold">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="noResults" class="text-center py-5 d-none">
+        <i class="bi bi-person-x text-muted opacity-25" style="font-size: 4rem;"></i>
+        <h4 class="text-muted mt-3">No matching members found in directory.</h4>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const searchIcon = document.getElementById('mainSearchIcon');
+    const noResults = document.getElementById('noResults');
+    const cards = document.querySelectorAll('.user-item');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase().trim();
+            let hasMatches = false;
+
+            // Toggle Search Icons
+            if (this.value.length > 0) {
+                clearBtn.classList.remove('d-none');
+                searchIcon.classList.add('d-none');
+            } else {
+                clearBtn.classList.add('d-none');
+                searchIcon.classList.remove('d-none');
+            }
+
+            // Filter Logic
+            cards.forEach(card => {
+                const name = card.querySelector('.user-name').innerText.toLowerCase();
+                const email = card.querySelector('.user-email').innerText.toLowerCase();
+                const role = card.querySelector('.role-badge').innerText.toLowerCase();
+
+                const isMatch = name.includes(filter) || email.includes(filter) || role.includes(filter);
+
+                card.style.display = isMatch ? 'block' : 'none';
+                if (isMatch) hasMatches = true;
+            });
+
+            if (noResults) noResults.classList.toggle('d-none', hasMatches);
+        });
+
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+            searchInput.focus();
+        });
+    }
+});
+</script>
+{% endblock %}

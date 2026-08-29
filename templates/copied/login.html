@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block style %}
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        /* --- Professional Continuous Scroll Bar --- */
+        .promo-bar {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 12px 0;
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .scroll-wrapper {
+            display: flex;
+            animation: marquee-infinite 25s linear infinite;
+        }
+
+        .scroll-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding-right: 50px;
+        }
+
+        @keyframes marquee-infinite {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .promo-bar:hover .scroll-wrapper {
+            animation-play-state: paused;
+        }
+
+        /* --- Form Styling --- */
+        .form-card {
+            border: none;
+            border-top: 5px solid #0d6efd;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s;
+        }
+
+        /* Show custom error messages on validation */
+        .was-validated .form-control:invalid ~ small {
+            display: block !important;
+        }
+
+        .btn-submit {
+            padding: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            text-transform: uppercase;
+            margin-top: 1rem;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .para { color: #dc3545; font-weight: 500; }
+
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="promo-bar">
+        <div class="scroll-wrapper">
+            <span class="scroll-text">✨ <strong>Welcome Back, Architect</strong> Pick up where you left off. Secure login for master developers! &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+            <span class="scroll-text">✨ <strong>Join Today:</strong> Start Learning and Grow. Buy DevBooks and Master in your field! &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+        </div>
+    </div>
+
+    <main class="container my-5">
+        {% if alert == 'user-not-found' %}
+            <div class="alert alert-danger shadow-sm border-0">User not found! Please check your email.</div>
+        {% elif alert == 'wrong-type' %}
+            <div class="alert alert-warning shadow-sm border-0">Not a Correct Type.</div>
+        {% elif alert == 'invalid-password' %}
+            <div class="alert alert-danger shadow-sm border-0">Invalid Password!</div>
+        {% elif alert == 'register-success' %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <strong>Registration Successful!</strong> Please, Log-In to the DevBook Store!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% elif alert == 'logged-out' %}
+            <div class="alert alert-primary alert-dismissible fade show border-0 shadow-sm" role="alert">
+                You have been <strong>Logged-out Successfully!</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+
+        <p class="para mt-3">*Please fill all the required fields!</p>
+
+        <div class="row justify-content-center">
+            <div class="col-md-18 col-lg-17">
+                <div class="form-card">
+                    <div class="page-header text-center">
+                        <h2 class="fw-bold text-dark">Login to the store</h2>
+                        <p class="text-muted small">Enter your credentials to access your library</p>
+                    </div>
+
+                    <form action="/users/login" method="POST" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="email"><i class="bi bi-envelope me-1"></i> Email* </label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="e.g. abc@gmail.com" required>
+                            <small id="email-error" style="color:red; display:none;">A valid email is required!</small>
+                        </div>
+                         <br>
+
+                        <div class="form-group">
+                             <label for="password"><i class="bi bi-lock me-1"></i> Password* </label>
+                             <input type="password" class="form-control" id="password" name="password" placeholder="Must contain 10 characters" minlength="10" maxlength="10" required>
+                             <small id="pass-error" style="color:red; display:none;">Password must be exactly 10 characters!</small>
+                        </div>
+                        <br>
+
+                        <div class="form-group">
+                             <label for="type"><i class="bi bi-person-badge me-1"></i> User-type* </label>
+                             <select class="form-control" name="type" id="type" required>
+                                 <option value="" selected disabled>Select user type</option>
+                                 <option value="Admin">Admin</option>
+                                 <option value="Guest">Guest</option>
+                             </select>
+                            <small id="type-error" style="color:red; display:none;">Please select 'Admin' or 'Guest'!</small>
+                        </div>
+                        <br>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-submit shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %}

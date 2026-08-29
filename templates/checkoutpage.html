@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f8f9fa; }
+    .checkout-form { background: white; border-radius: 15px; padding: 30px; }
+    .summary-card { border-radius: 15px; border: none; background: #fff; }
+    .form-control:focus, .form-select:focus { box-shadow: none; border-color: #0d6efd; }
+    .step-badge { width: 30px; height: 30px; background: #0d6efd; color: white; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; margin-right: 10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <h4 class="mb-4 fw-bold">Checkout</h4>
+
+            <form action="/place-order" method="POST">
+                <!-- 1. Shipping Address -->
+                <div class="checkout-form shadow-sm mb-4">
+                    <h5 class="mb-4"><span class="step-badge">1</span> Shipping Address</h5>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-bold text-muted">FIRST NAME</label>
+                            <input type="text" class="form-control" name="first_name" placeholder="John" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-bold text-muted">LAST NAME</label>
+                            <input type="text" class="form-control" name="last_name" placeholder="Doe" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">STREET ADDRESS</label>
+                            <input type="text" class="form-control" name="street_address" placeholder="123 Main St" required>
+                        </div>
+
+                        <!-- ZIP Code (Triggers Auto-fill) -->
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">ZIP CODE</label>
+                            <input type="text" class="form-control border-primary" id="zipCode" name="zip"
+                                   placeholder="10001"
+                                   maxlength="5"
+                                   pattern="\d{5}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                   required>
+                            <small class="text-primary" style="font-size: 0.7rem;">Auto-fills City/State</small>
+                        </div>
+
+                        <!-- City (Auto-filled) -->
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold text-muted">CITY</label>
+                            <input type="text" class="form-control" id="cityInput" name="city" required>
+                        </div>
+
+                        <!-- State (Auto-filled) -->
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">STATE</label>
+                            <select class="form-select" id="stateSelect" name="state" required>
+                                <option value="" disabled selected>Choose...</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Payment Details -->
+                <div class="checkout-form shadow-sm">
+                    <h5 class="mb-4"><span class="step-badge">2</span> Payment Details</h5>
+                    <div class="my-3">
+                        <div class="form-check form-check-inline">
+                            <input name="paymentMethod" value="Credit Card" type="radio" class="form-check-input" checked required>
+                            <label class="form-check-label">Credit Card</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input name="paymentMethod" value="PayPal" type="radio" class="form-check-input" required>
+                            <label class="form-check-label">PayPal</label>
+                        </div>
+                    </div>
+                    <div class="row gy-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">NAME ON CARD</label>
+                            <input type="text" class="form-control" name="nameOnCard" minlength="3" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">CARD NUMBER</label>
+                            <input type="text" class="form-control" name="cardNumber"
+                                   placeholder="0000 0000 0000 0000"
+                                   maxlength="16"
+                                   minlength="16"
+                                   pattern="\d{16}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                   required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">EXPIRATION</label>
+                            <input type="text" class="form-control" name="expiration"
+                                   placeholder="MM/YY"
+                                   maxlength="5"
+                                   pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
+                                   oninput="this.value = this.value.replace(/[^0-9\/]/g, '')"
+                                   required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted">CVV</label>
+                            <input type="password" class="form-control" name="cvv"
+                                   maxlength="4"
+                                   minlength="3"
+                                   pattern="\d{3,4}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                   required>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <button class="btn btn-primary btn-lg w-100 fw-bold" type="submit">PLACE ORDER - ${{ total_price }}</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. Order Summary -->
+        <div class="col-lg-4">
+            <div class="summary-card shadow-sm p-4 sticky-top" style="top: 2rem;">
+                <h5 class="fw-bold mb-4">Your Items</h5>
+                <ul class="list-group list-group-flush mb-3">
+                    {% for book in all_books %}
+                    <li class="list-group-item d-flex justify-content-between lh-sm px-0">
+                        <div>
+                            <h6 class="my-0 fw-bold text-truncate" style="max-width: 180px;">{{ book.book_title }}</h6>
+                            <small class="text-muted">Qty: {{ book.quantity }}</small>
+                        </div>
+                        <span class="text-muted">${{ book.book_price * book.quantity }}</span>
+                    </li>
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between px-0 pt-3">
+                        <span>Subtotal</span>
+                        <strong>${{ total_price }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0 text-success">
+                        <span>Shipping</span>
+                        <strong>FREE</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0 border-0 pt-3">
+                        <span class="fs-5 fw-bold">Total (USD)</span>
+                        <strong class="fs-4 text-primary">${{ total_price }}</strong>
+                    </li>
+                </ul>
+                <div class="alert alert-light border small mt-3">
+                    <i class="bi bi-shield-check me-2 text-primary"></i> Secure 256-bit SSL Encrypted Payment
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('zipCode').addEventListener('input', function(e) {
+        let zip = e.target.value;
+
+        // Trigger the Zippopotam API call only when exactly 5 digits are entered
+        if (zip.length === 5) {
+            document.getElementById('cityInput').value = "Loading...";
+
+            fetch(`https://api.zippopotam.us/us/${zip}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Invalid ZIP");
+                    return response.json();
+                })
+                .then(data => {
+                    const city = data.places[0]['place name'];
+                    const stateName = data.places[0]['state'];
+
+                    document.getElementById('cityInput').value = city;
+
+                    const stateDropdown = document.getElementById('stateSelect');
+                    for (let i = 0; i < stateDropdown.options.length; i++) {
+                        if (stateDropdown.options[i].value === stateName) {
+                            stateDropdown.selectedIndex = i;
+                            break;
+                        }
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('cityInput').value = "";
+                    document.getElementById('cityInput').placeholder = "Enter city manually";
+                });
+        }
+    });
+</script>
+{% endblock %}

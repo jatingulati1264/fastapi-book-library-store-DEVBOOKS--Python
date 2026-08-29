@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevBooks | Technical Library</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📘</text></svg>">
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --dark-bg: #1e293b;
+            --topbar-bg: #0f172a;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1; /* Pushes footer to the bottom */
+        }
+
+        /* --- NAVIGATION STYLES --- */
+        .top-bar {
+            background-color: var(--topbar-bg);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .main-navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            font-size: 1.4rem;
+        }
+        .nav-link {
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+        .dropdown-item {
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        /* --- FOOTER STYLES --- */
+        .site-footer {
+            background-color: var(--topbar-bg);
+            color: #cbd5e1;
+            padding: 60px 0 30px;
+        }
+        .footer-heading {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .footer-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .footer-link:hover {
+            color: white;
+        }
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        .social-icon:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+    </style>
+    {% block head %} {% endblock %}
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- TOP UTILITY BAR (NEW)                      -->
+    <!-- ========================================== -->
+    <div class="top-bar text-white-50 py-2 d-none d-lg-block">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-4">
+                <span><i class="bi bi-telephone-fill me-2 text-primary"></i> +1 (800) 555-BOOKS</span>
+                <span><i class="bi bi-envelope-fill me-2 text-primary"></i> support@devbooks.com</span>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="/faq" class="text-white-50 text-decoration-none hover-white">Help Center</a>
+                <span class="text-secondary">|</span>
+                <a href="/tracking" class="text-white-50 text-decoration-none hover-white">Track Order</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MAIN NAVBAR                                -->
+    <!-- ========================================== -->
+    <nav class="navbar navbar-expand-lg navbar-dark main-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-white" href="/">
+                <i class="bi bi-book-half text-primary me-2"></i>DevBooks
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a></li>
+
+                    {% if token %}
+                        <li class="nav-item"><a class="nav-link" href="/books"><i class="fas fa-book-open me-1"></i> Browse Books</a></li>
+
+                        <!-- New Categories Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"><i class="fas fa-layer-group me-1"></i> Categories</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/books?category=backend">Backend Development</a></li>
+                                <li><a class="dropdown-item" href="/books?category=frontend">Frontend & UI</a></li>
+                                <li><a class="dropdown-item" href="/books?category=devops">DevOps & Cloud</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/books">View All Books</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    <li class="nav-item"><a class="nav-link" href="/about-us"><i class="fas fa-globe me-1"></i> About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact"><i class="fas fa-envelope me-1"></i> Contact</a></li>
+                </ul>
+
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+                    {% if token %}
+                        <!-- Guest Resources -->
+                        {% if user and user.user_type == "Guest" %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"><i class="fas fa-tools me-1"></i> Resources</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/reading-guides"><i class="fas fa-bookmark me-2 text-primary"></i> Reading Guides</a></li>
+                                <li><a class="dropdown-item" href="/author-interviews"><i class="fas fa-microphone-alt me-2 text-primary"></i> Author Interviews</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+                        <!-- Admin Tools -->
+                        {% if user and user.user_type == 'Admin' %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-warning" role="button" data-bs-toggle="dropdown"><i class="fas fa-shield-alt me-1"></i> Admin</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/create-book"><i class="fas fa-book-medical me-2"></i> Add Books</a></li>
+                                <li><a class="dropdown-item" href="/users/view-users"><i class="fas fa-users-cog me-2"></i> Manage Users</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+                        <!-- User Account -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1 fs-5 align-middle"></i> {{ user.user_name.split(' ')[0] if user else 'Account' }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/users/update/{{user.user_id}}"><i class="fa-solid fa-user-edit me-2"></i> Update Profile</a></li>
+                                <li><a class="dropdown-item" href="/my-orders"><i class="fa-solid fa-box me-2"></i> Manage Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="/users/login"><i class="fas fa-sign-in-alt me-1"></i> Login</a></li>
+                        <li class="nav-item"><a class="btn btn-primary btn-sm px-3 fw-bold rounded-pill" href="/users/create"><i class="fas fa-user-plus me-1"></i> Sign Up</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========================================== -->
+    <!-- DYNAMIC PAGE CONTENT                       -->
+    <!-- ========================================== -->
+    {% block style %} {% endblock %}
+    {% block content %} {% endblock %}
+
+    <!-- ========================================== -->
+    <!-- SITE FOOTER                                -->
+    <!-- ========================================== -->
+    <footer class="site-footer mt-auto">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6 pe-lg-5">
+                    <h5 class="footer-heading"><i class="bi bi-book-half text-primary me-2"></i>DevBooks</h5>
+                    <p class="small mb-4">Building a better future through technical literacy. We provide the best curated resources for software engineers, developers, and tech enthusiasts worldwide.</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-github"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Explore</h5>
+                    <a href="/books" class="footer-link">Browse Library</a>
+                    <a href="/reading-guides" class="footer-link">Reading Guides</a>
+                    <a href="/author-interviews" class="footer-link">Author Interviews</a>
+                    <a href="/about-us" class="footer-link">About Us</a>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Support</h5>
+                    <a href="/faq" class="footer-link">FAQ</a>
+                    <a href="/contact" class="footer-link">Contact Us</a>
+                    <a href="/my-orders" class="footer-link">Track Order</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="footer-heading">Subscribe to Newsletter</h5>
+                    <p class="small">Get the latest updates on new technical book releases.</p>
+
+                    <!-- Wrapped inside a form -->
+                    <form action="/subscribe" method="POST">
+                        <div class="input-group mb-3">
+                            <input type="email" name="email" class="form-control border-0 shadow-none" placeholder="Email address" aria-label="Email address" required>
+                            <button class="btn btn-primary fw-bold px-3" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="mt-5 border-secondary opacity-25">
+            <div class="text-center small mt-4">
+                &copy; 2026 DevBooks Online Store. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ========================================== -->
+    <!-- CUSTOM STORE CHAT SUPPORT BOT              -->
+    <!-- ========================================== -->
+    <style>
+        #storeChatBtn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1050;
+            width: 60px;
+            height: 60px;
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(13, 110, 253, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        #storeChatBtn:hover { transform: scale(1.08); }
+        #storeChatWindow {
+            position: fixed;
+            bottom: 95px;
+            right: 25px;
+            z-index: 1050;
+            width: 350px;
+            max-height: 480px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        .chat-header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-body {
+            padding: 16px;
+            height: 320px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .chat-msg.bot {
+            background: #e2e8f0;
+            color: #1e293b;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .chat-msg.user {
+            background: #0d6efd;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .chat-footer {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+        .chat-footer input {
+            flex-grow: 1;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            outline: none;
+            background: #f8fafc;
+        }
+        .chat-footer input:focus { border-color: #0d6efd; background: white; }
+    </style>
+
+    <!-- Floating Chat Toggle Button -->
+    <div id="storeChatBtn" onclick="toggleChatWindow()">
+        <i class="bi bi-chat-dots-fill fs-4"></i>
+    </div>
+
+    <!-- Hidden Chat Box Window -->
+    <div id="storeChatWindow">
+        <div class="chat-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-robot fs-4"></i>
+                <div>
+                    <h6 class="mb-0 fw-bold">DevBooks Support</h6>
+                    <small style="font-size: 0.7rem; opacity: 0.9;">Typically replies instantly</small>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" onclick="toggleChatWindow()"></button>
+        </div>
+
+        <div class="chat-body" id="chatMessages">
+            <div class="chat-msg bot">
+                👋 Hello there! Welcome to DevBooks. How can I help you with your order or finding a specific book today?
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="chatUserInput" placeholder="Type your query here..." onkeypress="handleChatEnter(event)">
+            <button class="btn btn-primary btn-sm rounded-circle px-2" onclick="sendUserMessage()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChatWindow() {
+            const chatWin = document.getElementById('storeChatWindow');
+            if (chatWin.style.display === 'flex') {
+                chatWin.style.display = 'none';
+            } else {
+                chatWin.style.display = 'flex';
+                document.getElementById('chatUserInput').focus();
+            }
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') {
+                sendUserMessage();
+            }
+        }
+
+        function sendUserMessage() {
+            const inputField = document.getElementById('chatUserInput');
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            const chatBox = document.getElementById('chatMessages');
+
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-msg user';
+            userBubble.innerText = text;
+            chatBox.appendChild(userBubble);
+
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            setTimeout(() => {
+                const botBubble = document.createElement('div');
+                botBubble.className = 'chat-msg bot';
+
+                const lowerText = text.toLowerCase();
+
+                if (lowerText.includes('cancel') || lowerText.includes('window')) {
+                    botBubble.innerHTML = "You can cancel your order within the <strong>5-minute window</strong> directly from your <a href='/my-orders'>Manage Orders</a> page.";
+                }
+                else if (lowerText.includes('track') || lowerText.includes('shipping') || lowerText.includes('deliver')) {
+                    botBubble.innerHTML = "You can view real-time package updates and live tracking details by visiting your <a href='/my-orders'>Manage Orders</a> page.";
+                }
+                else if (lowerText.includes('refund') || lowerText.includes('return')) {
+                    botBubble.innerHTML = "Canceled orders within the 5-minute window automatically trigger a full refund. For returns, items can be sent back within 7 days.";
+                }
+                else {
+                    botBubble.innerHTML = `I want to make sure you get the right help! For custom queries or assistance, please contact our store support team directly at <strong>+1 (800) 555-BOOKS</strong> or email support@devbooks.com!`;
+                }
+
+                chatBox.appendChild(botBubble);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 600);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block style %}
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Inter', system-ui, sans-serif; }
+
+        /* --- Sophisticated Hero Section --- */
+        .about-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 120px 0 80px 0;
+            border-radius: 0 0 50px 50px;
+            margin-bottom: 50px;
+        }
+
+        .about-hero h1 {
+            letter-spacing: -1px;
+            font-size: 3.5rem;
+        }
+
+        /* --- Interactive Stats --- */
+        .stats-box {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 16px;
+            padding: 40px 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-box:hover {
+            transform: translateY(-10px);
+            border-color: #3b82f6;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+
+        /* --- Modern Timeline --- */
+        .timeline-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+
+        .timeline-item {
+            padding-left: 30px;
+            border-left: 3px solid #3b82f6;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -11px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .expertise-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .quote-card {
+            border-left: 5px solid #3b82f6;
+            background: #f8fafc;
+            font-style: italic;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <section class="about-hero text-center">
+        <div class="container">
+            <span class="badge bg-primary px-3 py-2 mb-3 rounded-pill">ESTABLISHED 2026</span>
+            <h1 class="fw-bold mb-3">Code. Read. Evolve.</h1>
+            <p class="lead opacity-75 mx-auto" style="max-width: 800px;">
+                DevBooks is not just a storefront—it’s an intellectual armory for the modern engineer. We curate the knowledge that powers the digital world.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-5 container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h6 class="text-primary fw-bold text-uppercase mb-2">Our Philosophy</h6>
+                <h2 class="fw-bold mb-4 display-6">Curation Over Volume</h2>
+                <p class="text-secondary">
+                    The internet is flooded with tutorials that expire in months. We believe in <strong>foundational knowledge</strong>. DevBooks was founded by senior architects who realized that high-quality physical books provide a focus that digital tabs can never match.
+                </p>
+                <p class="text-secondary mb-4">
+                    From the legendary "Dragon Book" on compilers to the newest frameworks in Quantum Computing, we verify every title for technical accuracy and educational value.
+                </p>
+
+                <div class="row g-4 mt-2">
+                    <div class="col-6">
+                        <div class="stats-box text-center">
+                            <div class="stats-number">5k+</div>
+                            <div class="fw-bold text-muted small text-uppercase">Technical Masterpieces</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-box text-center">
+                            <div class="stats-number">20k+</div>
+                            <div class="fw-bold text-muted small text-uppercase">Master Architects</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="timeline-container">
+                    <h3 class="fw-bold mb-5 d-flex align-items-center">
+                        <i class="bi bi-rocket-takeoff me-3 text-primary"></i> The DevBooks Roadmap
+                    </h3>
+
+                    <div class="timeline-item">
+                        <h5 class="fw-bold mb-1 text-dark">2024: Genesis</h5>
+                        <p class="text-muted">Founded in Bengaluru with a core focus on Low-Level Systems and C Architecture.</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h5 class="fw-bold mb-1 text-dark">2025: Deepening the Stack</h5>
+                        <p class="text-muted">Expanded into Distributed Systems, AI Research, and high-level Software Design Patterns.</p>
+                    </div>
+
+                    <div class="timeline-item mb-0">
+                        <h5 class="fw-bold mb-1 text-dark">2026: Global Hub</h5>
+                        <p class="text-muted">Currently serving 50+ countries, becoming the definitive resource for technical growth.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-dark text-white border-top border-secondary border-opacity-25">
+        <div class="container text-center">
+            <h6 class="text-primary fw-bold text-uppercase mb-3">Our Domains</h6>
+            <h2 class="fw-bold mb-5">Built on Engineering Pillars</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="bi bi-terminal expertise-icon"></i>
+                        <h5 class="fw-bold">Kernel & OS</h5>
+                        <p class="small opacity-50">Deep dives into C, Rust, and systems-level engineering.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="bi bi-diagram-3 expertise-icon"></i>
+                        <h5 class="fw-bold">Architecture</h5>
+                        <p class="small opacity-50">Mastering Microservices, Clean Code, and Design Patterns.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="bi bi-shield-lock expertise-icon"></i>
+                        <h5 class="fw-bold">Cyber Security</h5>
+                        <p class="small opacity-50">Advanced cryptography and secure systems implementation.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="bi bi-cpu expertise-icon"></i>
+                        <h5 class="fw-bold">AI & Neural Nets</h5>
+                        <p class="small opacity-50">The mathematics and theory behind modern intelligence.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white">
+        <div class="container text-center py-4">
+            <h3 class="fw-bold mb-4">Ready to upgrade your mental hardware?</h3>
+            <a href="/register" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-pill shadow">Join the DevBooks Community</a>
+        </div>
+    </section>
+
+{% endblock %}

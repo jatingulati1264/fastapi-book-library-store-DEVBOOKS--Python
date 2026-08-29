@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    body { background-color: #f4f7f6; font-family: 'Inter', system-ui, sans-serif; }
+
+    /* --- Professional Continuous Scroll Bar --- */
+    .promo-bar {
+        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 12px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+
+    .scroll-wrapper {
+        display: inline-flex; /* Required for horizontal scrolling width */
+        animation: marquee-infinite 25s linear infinite;
+    }
+
+    .scroll-text {
+        font-size: 0.95rem;
+        font-weight: 500;
+        padding-right: 60px; /* Gap between repeats */
+    }
+
+    @keyframes marquee-infinite {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); } /* Scrolls through half (one full set) */
+    }
+
+    .promo-bar:hover .scroll-wrapper {
+        animation-play-state: paused;
+    }
+
+    /* --- Hero Section --- */
+    .hero-gradient {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white;
+        padding: 100px 0;
+        border-radius: 0 0 50px 50px;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #3b82f6;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-padding { padding: 80px 0; }
+
+    .bg-light-custom { background-color: #ffffff; border-top: 1px solid #e2e8f0; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    {% if alert=='updated' %}
+       <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="background-color: #f0fdf4; color: #166534; border-left: 5px solid #22c55e !important;">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-check2-all me-3" style="font-size: 1.25rem;"></i>
+        <div>
+            <strong class="fw-bold">Profile Synchronized!</strong> Your changes have been successfully updated in the architect database.
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+    {% endif %}
+    <div class="promo-bar">
+        <div class="scroll-wrapper">
+            <span class="scroll-text">✨ <strong>Knowledge is the Ultimate Update:</strong> Register now for exclusive access to advanced technical resources. &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+            <span class="scroll-text">✨ <strong>Stop Googling, Start Learning:</strong> High-fidelity documentation and books for the modern engineer! &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+
+            <span class="scroll-text">✨ <strong>Knowledge is the Ultimate Update:</strong> Register now for exclusive access to advanced technical resources. &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+            <span class="scroll-text">✨ <strong>Stop Googling, Start Learning:</strong> High-fidelity documentation and books for the modern engineer! &nbsp; &nbsp; • &nbsp; &nbsp; </span>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        {% if alert == 'login-success' %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Welcome Back, Architect!</strong> Successfully logged in as {{ user.user_name }}.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+    </div>
+
+    <header class="hero-gradient text-center">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-3">Master Your Craft</h1>
+            <p class="lead mb-5 px-md-5 opacity-75">The world's most curated collection of technical literature for software engineers, architects, and lifelong learners.</p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="/books" class="btn btn-primary btn-lg px-5 fw-bold shadow">Explore Collection</a>
+                <a href="/mission" class="btn btn-outline-light btn-lg px-5">Our Mission</a>
+
+            </div>
+        </div>
+    </header>
+
+    <section class="section-padding container text-center">
+        <div class="row g-5">
+            <div class="col-md-4">
+                <i class="bi bi-patch-check feature-icon"></i>
+                <h4 class="fw-bold">Engineering Intelligence</h4>
+                <p class="text-muted">We don't stock everything. We only stock the "Holy Grail" books that define careers.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-lightning-charge feature-icon"></i>
+                <h4 class="fw-bold">Zero-Latency Learning</h4>
+                <p class="text-muted">Immediate access to digital previews and fast global shipping for physical masterpieces.</p>
+            </div>
+            <div class="col-md-4">
+                <i class="bi bi-shield-lock feature-icon"></i>
+                <h4 class="fw-bold">Trusted by Architects</h4>
+                <p class="text-muted">Join 50,000+ developers who trust DevBooks for their technical growth and documentation.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-light-custom section-padding">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="display-5 fw-bold mb-4">Mastering the Stack</h2>
+                    <p class="lead text-secondary">From low-level C and Systems Architecture to modern Distributed AI Frameworks. We specialize in the physical books every senior engineer should own.</p>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-primary me-2"></i> Systems Design & Scalability</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-primary me-2"></i> Algorithmic Complexity & Logic</li>
+                        <li class="mb-3"><i class="bi bi-check-circle-fill text-primary me-2"></i> Modern DevOps & Cloud Patterns</li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+                    <div class="p-5 bg-white shadow rounded-4 border">
+                        <i class="bi bi-quote display-1 text-primary opacity-25"></i>
+                        <p class="fs-4 fst-italic">"DevBooks provides the blueprint for better code. Their quality and selection are unmatched in the industry."</p>
+                        <hr class="w-25 mx-auto my-4">
+                        <p class="fw-bold mb-0 text-dark">Principal Engineer @ Silicon Valley</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-dark text-white text-center">
+        <div class="container">
+            <h2 class="fw-bold">Knowledge is the Ultimate Update</h2>
+            <p class="mb-4 opacity-75">Sign up for the DevBooks newsletter and get 10% off your first hardcopy purchase.</p>
+            <div class="d-flex justify-content-center">
+                <form class="d-flex w-75 w-md-50 gap-2">
+                    <input type="email" class="form-control" placeholder="architect@developer.com">
+                    <button class="btn btn-primary px-4 fw-bold" type="button">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

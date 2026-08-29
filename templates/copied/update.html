@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block style %}
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .form-card {
+            border: none;
+            border-top: 5px solid #0d6efd;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn-submit {
+            padding: 0.75rem;
+            font-weight: 700;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .para{
+            color: red;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <main class="container my-5">
+        <p class="para">*Please fill all the required fields!</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-17"> <div class="form-card">
+                    <div class="page-header text-center">
+                        <h2 class="fw-bold text-dark">Update Details</h2>
+                        <p class="text-muted small">Update your account information</p>
+                    </div>
+
+                    <form action="/users/update/{{ id }}" method="POST">
+
+                        <div class="form-group">
+                            <label for="name"><i class="bi bi-type me-1"></i> Name* </label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                   value="{{ update_record.user_name }}" required>
+                        </div>
+                         <br>
+                        <div class="form-group">
+                            <label for="email"><i class="bi bi-type me-1"></i> Email* </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   value="{{ update_record.user_email }}" required>
+                        </div>
+                         <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                     <label for="password"><i class="bi bi-lock me-1"></i> Password* </label>
+                                     <input type="password" class="form-control" id="password" name="password"
+                                            value="{{ update_record.user_password }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                        <label for="type"><i class="bi bi-person me-1"></i> User-type*</label>
+                            <select class="form-control bg-light" id="type" disabled>
+                                <option value="Admin" {% if update_record.user_type=='Admin' %} selected {% endif %}>Admin</option>
+                                <option value="Guest" {% if update_record.user_type=='Guest' %}  selected {% endif %}>Guest</option>
+                            </select>
+                            <input type="hidden" name="type" value="{{ update_record.user_type }}">
+                            <small class="text-muted">User type cannot be changed. Contact admin for assistance.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-submit shadow-sm">
+                            <i class="bi bi-cloud-arrow-up me-2"></i> Update Details
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

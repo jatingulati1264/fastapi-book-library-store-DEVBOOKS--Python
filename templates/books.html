@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+
+        .search-wrapper {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 4rem;
+        }
+
+        .search-container { position: relative; }
+
+        .search-input {
+            border-radius: 12px !important;
+            padding: 0.8rem 1rem 0.8rem 3rem !important;
+            border: 2px solid #f1f5f9 !important;
+            background-color: #f8fafc !important;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background-color: white !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .book-card {
+            border: none !important;
+            border-radius: 20px !important;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 22px 45px rgba(0,0,0,0.1) !important;
+        }
+
+        .img-wrapper {
+            position: relative;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .img-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-weight: 700;
+            text-decoration: none;
+            backdrop-filter: blur(2px);
+        }
+        .img-wrapper:hover .img-overlay {
+            opacity: 1;
+            color: white;
+        }
+
+        .date-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 5px 12px;
+            border-radius: 50px;
+        }
+
+        .clamp-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 3.2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .clamp-desc {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 4.2rem;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .author-tag {
+            color: #3b82f6;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .btn-cart {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .btn-cart:hover {
+            background: #1d4ed8;
+            transform: scale(1.02);
+            color: white;
+        }
+
+        .btn-action-sm {
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+
+    {% if alert %}
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            {% if alert == 'created-success' %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <strong><i class="bi bi-check2-circle me-2"></i>New Resource Added!</strong> The book is now live in the collection.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% elif alert == 'updated' %}
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                <strong><i class="bi bi-check2-all me-3" style="font-size: 1.25rem;"></i>Resource Updated.</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% elif alert == 'deleted' %}
+            <div class="alert alert-danger border-0 shadow-sm" role="alert">
+                <strong><i class="bi bi-trash3 me-2"></i>Resource Removed.</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% elif alert == 'all-deleted' %}
+            <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                <strong><i class="bi bi-trash3-fill me-2"></i>Store Cleared.</strong> All books have been successfully removed from the library archive.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 border-bottom pb-4 mb-5">
+        <div>
+            <h1 class="fw-black text-dark mb-1">Technical Library</h1>
+            <p class="text-muted mb-0">Curated documentation and textbooks for senior engineers.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-dark rounded-pill px-3 py-2">{{ new_books | length }} Volumes</span>
+
+            {% if user and user.user_type == 'Admin' %}
+            <div class="d-flex gap-2">
+                <a href="/create-book" class="btn btn-primary fw-bold shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Add New Book
+                </a>
+                <a href="/delete-all-books" class="btn btn-outline-danger fw-bold shadow-sm" onclick="return confirm('WARNING: Are you sure you want to delete ALL books from the store? This action cannot be undone.');">
+                    <i class="bi bi-trash3 me-1"></i> Clear All Books
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="search-wrapper">
+                <label class="search-label d-block mb-3 fw-bold text-uppercase small text-primary">Global Search</label>
+                <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="bookSearch" class="form-control search-input" placeholder="Search by Title, Author, or Content Summary...">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if new_books | length == 0 %}
+    <div class="text-center py-5">
+        <div class="opacity-25 mb-4"><i class="bi bi-database-exclamation display-1"></i></div>
+        <h3 class="text-muted">The archive is currently empty.</h3>
+
+        {% if user and user.user_type == 'Admin' %}
+        <a href="/create-book" class="btn btn-primary btn-lg mt-3 px-5">Add First Book</a>
+        {% endif %}
+    </div>
+    {% else %}
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="bookGrid">
+        {% for item in new_books %}
+        <div class="col book-item">
+            <div class="card h-100 book-card shadow-sm p-3">
+
+                <div class="img-wrapper">
+                    <img src="{{ item.images[0] if item.images else 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&q=80' }}" alt="Cover" class="w-100 h-100 object-fit-cover">
+                    <a href="/books/{{ item._id }}" class="img-overlay">
+                        <i class="bi bi-eye me-2 fs-5"></i> View Book Details
+                    </a>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="date-badge">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        {{ item.book_created_at if item.book_created_at else "2026-01-18" }}
+                    </span>
+                    {% if item.book_available_copies | int == 0 %}
+                        <span class="badge bg-danger rounded-1 small">OUT OF STOCK</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-0 d-flex flex-column">
+                    <a href="/books/{{ item._id }}" class="text-decoration-none">
+                        <h5 class="clamp-title hover-primary" title="{{ item.book_title }}">{{ item.book_title }}</h5>
+                    </a>
+
+                    <span class="author-tag">by {{ item.book_author }}</span>
+
+                    <p class="clamp-desc text-secondary">
+                        {{ item.book_description }}
+                    </p>
+
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-end mb-3">
+                            <div>
+                                <small class="text-muted d-block small">PRICE</small>
+                                <span class="price-tag">${{ item.book_price }}</span>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block small">AVAILABILITY</small>
+                                <span class="badge bg-light text-dark border">{{ item.book_available_copies }} / {{ item.book_total_copies }}</span>
+                            </div>
+                        </div>
+
+                        {% if user and user.user_type == 'Admin' %}
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <a href="/update/{{item._id}}" class="btn btn-warning btn-action-sm w-100 fw-bold">Edit</a>
+                            </div>
+                            <div class="col-6">
+                                <a href="/delete/{{item._id}}" class="btn btn-outline-danger btn-action-sm w-100 fw-bold">Delete</a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <a href="/books/{{ item._id }}" class="btn btn-outline-secondary w-100 fw-bold" style="border-radius: 12px; padding: 10px;">
+                                    View Details
+                                </a>
+                            </div>
+                            <div class="col-12">
+                                <a href="/add-cartitem/{{item._id}}" class="btn btn-cart w-100 d-flex align-items-center justify-content-center gap-2 {% if item.book_available_copies | int == 0 %}disabled{% endif %}">
+                                    <i class="bi bi-bag-plus"></i> Add to Cart
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="noResults" class="text-center py-5 d-none">
+        <i class="bi bi-search text-muted display-4"></i>
+        <h4 class="text-muted mt-3">No matching resources found.</h4>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('bookSearch');
+        const noResults = document.getElementById('noResults');
+        const cards = document.querySelectorAll('.book-item');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const filter = this.value.toLowerCase().trim();
+                let hasMatches = false;
+
+                cards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    const isMatch = text.includes(filter);
+                    card.style.display = isMatch ? 'block' : 'none';
+                    if (isMatch) hasMatches = true;
+                });
+
+                noResults.classList.toggle('d-none', hasMatches);
+            });
+        }
+    });
+</script>
+{% endblock %}
