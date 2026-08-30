@@ -87,7 +87,7 @@ async def create_user(
         name: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
-        type: str = Form(...),
+        # Notice we removed the `type: str = Form(...)` parameter completely
         profile_image: UploadFile = File(None)
 ):
     if conn.books.users.find_one({'user_email': email}):
@@ -112,7 +112,7 @@ async def create_user(
         "user_email": email,
         "user_password": hashpw.decode(),
         "token": token,
-        "user_type": type,
+        "user_type": "Guest",  # HARDCODED: All public registrations are forced to Guest
         "user_avatar": avatar_url,
         "user_created_at": datetime.utcnow().strftime("%Y-%m-%d")
     }
