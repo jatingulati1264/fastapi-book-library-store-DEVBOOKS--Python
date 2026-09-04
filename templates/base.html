@@ -112,7 +112,7 @@
 <body>
 
     <!-- ========================================== -->
-    <!-- TOP UTILITY BAR (NEW)                      -->
+    <!-- TOP UTILITY BAR                            -->
     <!-- ========================================== -->
     <div class="top-bar text-white-50 py-2 d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
@@ -188,16 +188,31 @@
                         </li>
                         {% endif %}
 
-                        <!-- User Account -->
+                        <!-- USER ACCOUNT (UPDATED WITH AVATAR) -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1 fs-5 align-middle"></i> {{ user.user_name.split(' ')[0] if user else 'Account' }}
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- Profile Avatar Image -->
+                                <img src="{{ user.user_avatar }}" alt="Avatar" class="rounded-circle border border-2 border-secondary me-2" width="32" height="32" style="object-fit: cover;">
+                                <span>{{ user.user_name.split(' ')[0] if user else 'Account' }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/users/update/{{user.user_id}}"><i class="fa-solid fa-user-edit me-2"></i> Update Profile</a></li>
-                                <li><a class="dropdown-item" href="/my-orders"><i class="fa-solid fa-box me-2"></i> Manage Orders</a></li>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <!-- Profile Header Info -->
+                                <li>
+                                    <div class="dropdown-header d-flex flex-column px-3 py-2">
+                                        <span class="fw-bold text-dark">{{ user.user_name }}</span>
+                                        <span class="text-muted small">{{ user.user_email }}</span>
+                                        <span class="badge {% if user.user_type == 'Admin' %}bg-danger{% else %}bg-primary{% endif %} mt-2 w-auto align-self-start">
+                                            {{ user.user_type }}
+                                        </span>
+                                    </div>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+
+                                <li><a class="dropdown-item py-2" href="/users/update/{{user.user_id}}"><i class="fa-solid fa-user-edit me-2 text-secondary"></i> Update Profile</a></li>
+                                <li><a class="dropdown-item py-2" href="/my-orders"><i class="fa-solid fa-box me-2 text-secondary"></i> Manage Orders</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger fw-bold" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -248,7 +263,6 @@
                     <h5 class="footer-heading">Subscribe to Newsletter</h5>
                     <p class="small">Get the latest updates on new technical book releases.</p>
 
-                    <!-- Wrapped inside a form -->
                     <form action="/subscribe" method="POST">
                         <div class="input-group mb-3">
                             <input type="email" name="email" class="form-control border-0 shadow-none" placeholder="Email address" aria-label="Email address" required>

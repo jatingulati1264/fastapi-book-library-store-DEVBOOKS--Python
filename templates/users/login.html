@@ -104,11 +104,9 @@
     <main class="container my-4">
         <!-- System Alert Messages -->
         <div class="row justify-content-center">
-            <div class="col-12 col-lg-10">
+            <div class="col-12 col-lg-5">
                 {% if alert == 'user-not-found' %}
                     <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4"><i class="bi bi-exclamation-triangle-fill me-2"></i> Account not found! Please check your email address.</div>
-                {% elif alert == 'wrong-type' %}
-                    <div class="alert alert-warning shadow-sm border-0 rounded-3 mb-4"><i class="bi bi-shield-exclamation me-2"></i> Selected user type does not match profile permissions.</div>
                 {% elif alert == 'invalid-password' %}
                     <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4"><i class="bi bi-key-fill me-2"></i> Invalid security password entered!</div>
                 {% elif alert == 'register-success' %}
@@ -126,8 +124,8 @@
         </div>
 
         <div class="row justify-content-center">
-            <!-- Expanded width layout -->
-            <div class="col-12 col-lg-10">
+            <!-- Centered, compact width for Login -->
+            <div class="col-12 col-lg-5 col-md-8">
                 <div class="auth-card">
                     <div class="auth-header text-center">
                         <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 65px; height: 65px;">
@@ -155,16 +153,6 @@
                                      </button>
                                  </div>
                                  <div class="invalid-feedback">Password must be exactly 10 characters.</div>
-                            </div>
-
-                            <div class="mb-4">
-                                 <label for="type" class="form-label"><i class="bi bi-person-badge me-1"></i> Account Role *</label>
-                                 <select class="form-control" name="type" id="type" required>
-                                     <option value="" selected disabled>Select your role</option>
-                                     <option value="Admin">Admin</option>
-                                     <option value="Guest">Guest</option>
-                                 </select>
-                                 <div class="invalid-feedback">Please select your system role.</div>
                             </div>
 
                             <div class="mt-4">

@@ -62,6 +62,26 @@
     .required-asterisk {
         color: #e11d48;
     }
+
+    /* New style for the avatar display box */
+    .avatar-preview-box {
+        background-color: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .avatar-preview-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .avatar-preview-img:hover {
+        opacity: 0.8;
+    }
 </style>
 {% endblock %}
 
@@ -104,20 +124,33 @@
 
                         <div class="col-md-6">
                             <label for="type" class="form-label"><i class="bi bi-shield-lock me-1"></i> System Role</label>
-                            <select class="form-control text-muted" style="background-color: #e2e8f0; cursor: not-allowed;" id="type" disabled>
+                            <select class="form-control text-muted fw-bold" style="background-color: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1;" id="type" disabled>
                                 <option value="Admin" {% if update_record.user_type == 'Admin' %} selected {% endif %}>Admin</option>
                                 <option value="Guest" {% if update_record.user_type == 'Guest' %} selected {% endif %}>Guest</option>
                             </select>
-                            <input type="hidden" name="type" value="{{ update_record.user_type }}">
-                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i> Contact admin to change roles.</small>
+                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i> Contact an administrator to change system roles.</small>
                         </div>
                     </div>
 
-                    <!-- Profile Image File Upload Field -->
+                    <!-- Profile Image Display & File Upload Field with Live Preview -->
                     <div class="mb-4">
-                        <label for="profile_image" class="form-label"><i class="bi bi-image me-1"></i> Profile Avatar Image</label>
-                        <input type="file" class="form-control bg-white" id="profile_image" name="profile_image" accept="image/*">
-                        <small class="text-muted">Optional: Upload a new profile picture. Leave blank to keep your current avatar.</small>
+                        <label for="profile_image" class="form-label"><i class="bi bi-image me-1"></i> Profile Avatar</label>
+
+                        <div class="avatar-preview-box d-flex align-items-center gap-4">
+                            <!-- Current Image (Clickable for upload) -->
+                            <div class="position-relative">
+                                <img id="avatarPreview" src="{{ update_record.user_avatar }}" alt="Current Avatar"
+                                     class="rounded-circle shadow-sm border border-3 border-white avatar-preview-img"
+                                     onclick="document.getElementById('profile_image').click();"
+                                     title="Click to upload new image">
+                            </div>
+
+                            <!-- Upload Input -->
+                            <div class="flex-grow-1">
+                                <input type="file" class="form-control bg-white" id="profile_image" name="profile_image" accept="image/*" onchange="previewImage(event)">
+                                <small class="text-muted d-block mt-2"><i class="bi bi-lightbulb text-warning me-1"></i>Click the image or the "Choose File" button to preview a new avatar.</small>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mt-5">
@@ -130,4 +163,21 @@
         </div>
     </div>
 </main>
+
+<script>
+    function previewImage(event) {
+        const reader = new FileReader();
+
+        // When the file is loaded, update the image src
+        reader.onload = function() {
+            const output = document.getElementById('avatarPreview');
+            output.src = reader.result;
+        };
+
+        // Read the selected file as a Data URL
+        if (event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    }
+</script>
 {% endblock %}
