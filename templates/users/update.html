@@ -63,24 +63,29 @@
         color: #e11d48;
     }
 
-    /* New style for the avatar display box */
-    .avatar-preview-box {
-        background-color: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 12px;
-        padding: 1.25rem;
-    }
-
     .avatar-preview-img {
-        width: 80px;
-        height: 80px;
+        width: 110px;
+        height: 110px;
         object-fit: cover;
         cursor: pointer;
-        transition: opacity 0.2s;
+        transition: all 0.3s ease;
     }
 
-    .avatar-preview-img:hover {
-        opacity: 0.8;
+    .avatar-container:hover .avatar-preview-img {
+        opacity: 0.85;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+    }
+
+    .edit-pencil-badge {
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .avatar-container:hover .edit-pencil-badge {
+        transform: scale(1.1);
+        background-color: #0b5ed7 !important;
     }
 </style>
 {% endblock %}
@@ -90,19 +95,27 @@
     <div class="row justify-content-center">
         <div class="col-12 col-lg-10">
             <div class="form-card">
-                <div class="page-header text-center">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 60px; height: 60px;">
-                        <i class="bi bi-person-gear fs-2"></i>
-                    </div>
-                    <h2 class="fw-bold text-dark">Update Profile</h2>
-                    <p class="text-muted small mb-0">Modify your account settings and credentials below.</p>
-                    <p class="small text-danger mt-2 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i> All fields marked with * are required.</p>
-                </div>
 
-                <!-- Added enctype="multipart/form-data" to allow file/image uploads -->
                 <form action="/users/update/{{ id }}" method="POST" enctype="multipart/form-data">
 
-                    <!-- Placed Name and Email side-by-side -->
+                    <div class="page-header text-center">
+                        <div class="position-relative d-inline-block mb-3 avatar-container" onclick="document.getElementById('profile_image').click();" title="Click to change profile picture">
+                            <img id="avatarPreview" src="{{ update_record.user_avatar }}" alt="Current Avatar"
+                                 class="rounded-circle shadow-sm border border-4 border-white avatar-preview-img">
+
+                            <div class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow edit-pencil-badge"
+                                 style="transform: translate(-5px, -5px);">
+                                <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
+                            </div>
+                        </div>
+
+                        <input type="file" class="d-none" id="profile_image" name="profile_image" accept="image/*" onchange="previewImage(event)">
+
+                        <h2 class="fw-bold text-dark">Update Profile</h2>
+                        <p class="text-muted small mb-0">Modify your account settings and credentials below.</p>
+                        <p class="small text-danger mt-2 fw-semibold"><i class="bi bi-exclamation-circle me-1"></i> All fields marked with * are required.</p>
+                    </div>
+
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label for="name" class="form-label"><i class="bi bi-person me-1"></i> Full Name <span class="required-asterisk">*</span></label>
@@ -115,7 +128,6 @@
                         </div>
                     </div>
 
-                    <!-- Placed Password and System Role side-by-side -->
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label for="password" class="form-label"><i class="bi bi-lock me-1"></i> Password <span class="required-asterisk">*</span></label>
@@ -124,36 +136,25 @@
 
                         <div class="col-md-6">
                             <label for="type" class="form-label"><i class="bi bi-shield-lock me-1"></i> System Role</label>
-                            <select class="form-control text-muted fw-bold" style="background-color: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1;" id="type" disabled>
-                                <option value="Admin" {% if update_record.user_type == 'Admin' %} selected {% endif %}>Admin</option>
-                                <option value="Guest" {% if update_record.user_type == 'Guest' %} selected {% endif %}>Guest</option>
-                            </select>
-                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i> Contact an administrator to change system roles.</small>
+
+                            {% if user.user_type == 'Admin' %}
+                                <select class="form-control fw-bold border-primary" name="type" id="type">
+                                    <option value="Admin" {% if update_record.user_type == 'Admin' %} selected {% endif %}>Admin</option>
+                                    <option value="Instructor" {% if update_record.user_type == 'Instructor' %} selected {% endif %}>Instructor</option>
+                                    <option value="Student" {% if update_record.user_type == 'Student' %} selected {% endif %}>Student</option>
+                                </select>
+                                <small class="text-success d-block mt-2"><i class="bi bi-check-circle me-1"></i> You have admin rights to modify this role.</small>
+                            {% else %}
+                                <select class="form-control text-muted fw-bold" style="background-color: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1;" disabled>
+                                    <option value="{{ update_record.user_type }}" selected>{{ update_record.user_type }}</option>
+                                </select>
+                                <input type="hidden" name="type" value="{{ update_record.user_type }}">
+                                <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i> Contact an administrator to change system roles.</small>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- Profile Image Display & File Upload Field with Live Preview -->
-                    <div class="mb-4">
-                        <label for="profile_image" class="form-label"><i class="bi bi-image me-1"></i> Profile Avatar</label>
-
-                        <div class="avatar-preview-box d-flex align-items-center gap-4">
-                            <!-- Current Image (Clickable for upload) -->
-                            <div class="position-relative">
-                                <img id="avatarPreview" src="{{ update_record.user_avatar }}" alt="Current Avatar"
-                                     class="rounded-circle shadow-sm border border-3 border-white avatar-preview-img"
-                                     onclick="document.getElementById('profile_image').click();"
-                                     title="Click to upload new image">
-                            </div>
-
-                            <!-- Upload Input -->
-                            <div class="flex-grow-1">
-                                <input type="file" class="form-control bg-white" id="profile_image" name="profile_image" accept="image/*" onchange="previewImage(event)">
-                                <small class="text-muted d-block mt-2"><i class="bi bi-lightbulb text-warning me-1"></i>Click the image or the "Choose File" button to preview a new avatar.</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-5">
+                    <div class="mt-4">
                         <button type="submit" class="btn btn-primary w-100 btn-submit shadow-sm">
                             <i class="bi bi-cloud-arrow-up me-2"></i> Save Changes
                         </button>
@@ -167,14 +168,10 @@
 <script>
     function previewImage(event) {
         const reader = new FileReader();
-
-        // When the file is loaded, update the image src
         reader.onload = function() {
             const output = document.getElementById('avatarPreview');
             output.src = reader.result;
         };
-
-        // Read the selected file as a Data URL
         if (event.target.files[0]) {
             reader.readAsDataURL(event.target.files[0]);
         }

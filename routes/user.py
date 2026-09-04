@@ -1,19 +1,14 @@
-# routes for user login and signup
 import uuid
 import shutil
 import os
-from os import access
 
-from bson import ObjectId
 from fastapi import APIRouter, Request, HTTPException, UploadFile, File, Form
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 from config.db import conn
-from models.user import Register_User, Updated_User
-import bcrypt  # to securely hashed passwords
-from jose import jwt  # for jwt authentication
-from schemas.user import UserEntity, UsersEntity
-
+from models.user import Updated_User
+import bcrypt
+from jose import jwt
 from datetime import datetime
 
 user = APIRouter()
@@ -50,14 +45,11 @@ async def user_login_post(request: Request):
 
     email = formDict.get('email')
     password = formDict.get('password')
-    # REMOVED: u_type = formDict.get('type')
 
     user_db = conn.books.users.find_one({"user_email": email})
 
     if not user_db:
         return RedirectResponse('/users/login?alert=user-not-found', status_code=303)
-
-    # REMOVED: The check comparing form u_type with database user_type
 
     is_password_hashed = bcrypt.checkpw(
         password.encode('utf-8'),
@@ -86,7 +78,6 @@ async def create_user_post(
         name: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
-        # Notice we removed the `type: str = Form(...)` parameter completely
         profile_image: UploadFile = File(None)
 ):
     if conn.books.users.find_one({'user_email': email}):
@@ -111,7 +102,7 @@ async def create_user_post(
         "user_email": email,
         "user_password": hashpw.decode(),
         "token": token,
-        "user_type": "Guest",  # HARDCODED: All public registrations are forced to Guest
+        "user_type": "Student",  # NEW DEFAULT: All public registrations are 'Student'
         "user_avatar": avatar_url,
         "user_created_at": datetime.utcnow().strftime("%Y-%m-%d")
     }
@@ -127,14 +118,17 @@ async def create_user_post(
 @user.get('/users/update/{id}', response_class=HTMLResponse)
 async def update_user_get(request: Request, id: str):
     token = request.cookies.get("access_token")
+    current_user = get_user(request)
     existing_user = conn.books.users.find_one({"user_id": id})
+
     if not existing_user:
         raise HTTPException(status_code=404, detail={"message": "user not found with given id!"})
+
     return templates.TemplateResponse('users/update.html', {
         "request": request,
         "id": id,
         "update_record": existing_user,
-        "user": existing_user,
+        "user": current_user,
         "token": token
     })
 
@@ -146,9 +140,13 @@ async def update_user_post(
         name: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
-        # Removed type: str = Form(...) so users cannot manipulate their role during update
+        type: str = Form(None),  # Optional field
         profile_image: UploadFile = File(None)
 ):
+    current_user = get_user(request)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     existing_user = conn.books.users.find_one({"user_id": id})
     if not existing_user:
         raise HTTPException(status_code=404, detail="User not found!")
@@ -169,20 +167,22 @@ async def update_user_post(
     else:
         final_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
 
+    # SECURE ROLE ASSIGNMENT
+    final_type = existing_user.get('user_type')
+    if current_user.get('user_type') == 'Admin' and type:
+        final_type = type
+
     updated_data = {
         "user_name": name,
         "user_email": email,
         "user_password": final_password,
-        "user_type": existing_user.get('user_type'), # Securely pull role from database
+        "user_type": final_type,
         "user_avatar": avatar_url
     }
 
     validate = Updated_User(**updated_data)
     if validate:
-        conn.books.users.update_one(
-            {"user_id": id},
-            {"$set": updated_data}
-        )
+        conn.books.users.update_one({"user_id": id}, {"$set": updated_data})
         return RedirectResponse('/?alert=updated', status_code=303)
     raise HTTPException(status_code=400, detail={"message": "unable to update!"})
 
@@ -197,23 +197,19 @@ async def logout(request: Request):
 @user.get('/')
 async def home(request: Request):
     token = request.cookies.get("access_token")
-
     user_data = None
-
     if token:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_data = conn.books.users.find_one({"user_id": payload.get("user_id")})
-
         except Exception as e:
-            print(f"TOKEN ERROR!{e}")
             token = None
 
-        return templates.TemplateResponse('index.html', {
-            "request": request,
-            "token": token,
-            "user": user_data
-        })
+    return templates.TemplateResponse('index.html', {
+        "request": request,
+        "token": token,
+        "user": user_data
+    })
 
 
 @user.get('/users/view-users', response_class=HTMLResponse)
@@ -221,7 +217,9 @@ async def view_all_users(request: Request):
     user_data = get_user(request)
     token = request.cookies.get('access_token')
     users = conn.books.users.find({})
-    all_users = UsersEntity(users)
+
+    all_users = [{"user_id": i["user_id"], "user_name": i["user_name"], "user_email": i["user_email"],
+                  "user_type": i.get("user_type", "Student"), "user_avatar": i.get("user_avatar")} for i in users]
 
     return templates.TemplateResponse('users/view-users.html', {
         "request": request,
@@ -229,68 +227,3 @@ async def view_all_users(request: Request):
         "all_users": all_users,
         "user": user_data
     })
-
-
-@user.post('/users/admin-create')
-async def admin_create_user(request: Request):
-    current_user = get_user(request)
-    if not current_user or current_user.get('user_type') != 'Admin':
-        raise HTTPException(status_code=403, detail="Unauthorized action!")
-
-    form = await request.form()
-    formDict = dict(form)
-
-    if conn.books.users.find_one({'user_email': formDict.get('email')}):
-        raise HTTPException(status_code=400, detail="User already exists!")
-
-    hashpw = bcrypt.hashpw(formDict.get('password').encode(), bcrypt.gensalt())
-    user_id = str(uuid.uuid4())
-    token = jwt.encode({"user_id": user_id}, SECRET_KEY, algorithm=ALGORITHM)
-
-    data = {
-        "user_id": user_id,
-        "user_name": formDict.get('name'),
-        "user_email": formDict.get('email'),
-        "user_password": hashpw.decode(),
-        "token": token,
-        "user_type": formDict.get('type'), # Admin creates this, so they CAN select type
-        "user_avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80",
-        "user_created_at": datetime.utcnow().strftime("%Y-%m-%d")
-    }
-
-    inserted_data = conn.books.users.insert_one(data)
-
-    if not inserted_data:
-        raise HTTPException(status_code=400, detail={"message": "Unable to register the user!"})
-
-    return RedirectResponse('/users/view-users', status_code=303)
-
-
-@user.get('/users/delete/{id}')
-async def delete_user(id: str, request: Request):
-    user_db = conn.books.users.delete_one({"user_id": id})
-
-    if user_db.deleted_count > 0:
-        return RedirectResponse('/users/view-users', status_code=303)
-
-    raise HTTPException(status_code=404, detail="User Detail not found!")
-
-
-def UserEntity(item) -> dict:
-    return {
-        "user_id": item["user_id"],
-        "user_name": item["user_name"],
-        "user_email": item["user_email"],
-        "user_password": item["user_password"],
-        "user_type": item["user_type"],
-        "token": item["token"],
-        "user_avatar": item.get("user_avatar",
-                                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80"),
-        "user_created_at": item.get("user_created_at", "N/A"),
-    }
-
-
-def UsersEntity(items) -> list:
-    return [
-        UserEntity(item) for item in items
-    ]
