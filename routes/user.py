@@ -35,7 +35,7 @@ def get_user(request: Request):
 
 
 @user.get('/users/login', response_class=HTMLResponse)
-async def user_login(request: Request, alert: str = None):
+async def user_login_get(request: Request, alert: str = None):
     return templates.TemplateResponse('users/login.html', {
         "request": request,
         "token": None,
@@ -44,31 +44,30 @@ async def user_login(request: Request, alert: str = None):
 
 
 @user.post('/users/login')
-async def user_login(request: Request):
+async def user_login_post(request: Request):
     form = await request.form()
     formDict = dict(form)
 
     email = formDict.get('email')
     password = formDict.get('password')
-    u_type = formDict.get('type')
+    # REMOVED: u_type = formDict.get('type')
 
-    user = conn.books.users.find_one({"user_email": email})
+    user_db = conn.books.users.find_one({"user_email": email})
 
-    if not user:
+    if not user_db:
         return RedirectResponse('/users/login?alert=user-not-found', status_code=303)
 
-    if u_type != user.get('user_type'):
-        return RedirectResponse('/users/login?alert=wrong-type', status_code=303)
+    # REMOVED: The check comparing form u_type with database user_type
 
     is_password_hashed = bcrypt.checkpw(
         password.encode('utf-8'),
-        user.get('user_password').encode('utf-8')
+        user_db.get('user_password').encode('utf-8')
     )
 
     if not is_password_hashed:
         return RedirectResponse('/users/login?alert=invalid-password', status_code=303)
 
-    token = jwt.encode({"user_id": user.get('user_id')}, SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode({"user_id": user_db.get('user_id')}, SECRET_KEY, algorithm=ALGORITHM)
 
     response = RedirectResponse('/?alert=login-success', status_code=303)
     response.set_cookie(key="access_token", value=token, httponly=True, path="/")
@@ -77,12 +76,12 @@ async def user_login(request: Request):
 
 
 @user.get('/users/create', response_class=HTMLResponse)
-async def create_user(request: Request):
+async def create_user_get(request: Request):
     return templates.TemplateResponse('users/create.html', {"request": request})
 
 
 @user.post('/users/create')
-async def create_user(
+async def create_user_post(
         request: Request,
         name: str = Form(...),
         email: str = Form(...),
@@ -126,7 +125,7 @@ async def create_user(
 
 
 @user.get('/users/update/{id}', response_class=HTMLResponse)
-async def update_user(request: Request, id: str):
+async def update_user_get(request: Request, id: str):
     token = request.cookies.get("access_token")
     existing_user = conn.books.users.find_one({"user_id": id})
     if not existing_user:
@@ -141,13 +140,13 @@ async def update_user(request: Request, id: str):
 
 
 @user.post('/users/update/{id}')
-async def update_user(
+async def update_user_post(
         request: Request,
         id: str,
         name: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
-        type: str = Form(...),
+        # Removed type: str = Form(...) so users cannot manipulate their role during update
         profile_image: UploadFile = File(None)
 ):
     existing_user = conn.books.users.find_one({"user_id": id})
@@ -174,7 +173,7 @@ async def update_user(
         "user_name": name,
         "user_email": email,
         "user_password": final_password,
-        "user_type": existing_user.get('user_type'),
+        "user_type": existing_user.get('user_type'), # Securely pull role from database
         "user_avatar": avatar_url
     }
 
@@ -191,7 +190,6 @@ async def update_user(
 @user.get('/logout')
 async def logout(request: Request):
     response = RedirectResponse('/users/login?alert=logged-out', status_code=303)
-
     response.delete_cookie("access_token", path="/")
     return response
 
@@ -220,7 +218,7 @@ async def home(request: Request):
 
 @user.get('/users/view-users', response_class=HTMLResponse)
 async def view_all_users(request: Request):
-    user = get_user(request)
+    user_data = get_user(request)
     token = request.cookies.get('access_token')
     users = conn.books.users.find({})
     all_users = UsersEntity(users)
@@ -229,7 +227,7 @@ async def view_all_users(request: Request):
         "request": request,
         "token": token,
         "all_users": all_users,
-        "user": user
+        "user": user_data
     })
 
 
@@ -255,7 +253,7 @@ async def admin_create_user(request: Request):
         "user_email": formDict.get('email'),
         "user_password": hashpw.decode(),
         "token": token,
-        "user_type": formDict.get('type'),
+        "user_type": formDict.get('type'), # Admin creates this, so they CAN select type
         "user_avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80",
         "user_created_at": datetime.utcnow().strftime("%Y-%m-%d")
     }
@@ -270,9 +268,9 @@ async def admin_create_user(request: Request):
 
 @user.get('/users/delete/{id}')
 async def delete_user(id: str, request: Request):
-    user = conn.books.users.delete_one({"user_id": id})
+    user_db = conn.books.users.delete_one({"user_id": id})
 
-    if user.deleted_count > 0:
+    if user_db.deleted_count > 0:
         return RedirectResponse('/users/view-users', status_code=303)
 
     raise HTTPException(status_code=404, detail="User Detail not found!")
